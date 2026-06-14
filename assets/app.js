@@ -183,15 +183,37 @@ function colorBadgeHtml(colors) {
 
 const MISSING_PLACEHOLDER = 'image-missing';
 
-// All valid image URLs across a card's variants, in order
+// All valid image URLs across a card's variants, with the preferred base image first
 function getImageUrls(card) {
-  return (card.variants || [])
+  const preferred = getMainImageUrl(card);
+  const all = (card.variants || [])
     .map(v => v.tcgplayer_image_url)
     .filter(u => u && !u.includes(MISSING_PLACEHOLDER));
+  if (!preferred) return all;
+  return [preferred, ...all.filter(u => u !== preferred)];
 }
 
+// Priority order for picking the "hero" display image:
+// Normal base print first, then parallel, then anything else
+const LABEL_PRIORITY = ['normal', 'parallel rare', 'parallel'];
+
 function getMainImageUrl(card) {
-  return getImageUrls(card)[0] || null;
+  const variants = (card.variants || []).filter(
+    v => v.tcgplayer_image_url && !v.tcgplayer_image_url.includes(MISSING_PLACEHOLDER)
+  );
+  if (!variants.length) return null;
+
+  // Try to find a base set print first
+  for (const priority of LABEL_PRIORITY) {
+    const match = variants.find(v =>
+      (v.label || '').toLowerCase() === priority &&
+      (v.acquisition?.method === 'booster_pack' || v.acquisition?.method === 'starter_deck')
+    );
+    if (match) return match.tcgplayer_image_url;
+  }
+
+  // Fall back to first available
+  return variants[0].tcgplayer_image_url;
 }
 
 // Attaches a smart fallback chain to an img element.

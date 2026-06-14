@@ -45,7 +45,7 @@ const ALL_SETS = [
   { code: 'ST21',  name: 'Red Shanks',                  group: 'starter', available: false },
   { code: 'ST22',  name: 'Green Monkey D. Luffy',       group: 'starter', available: false },
   // ── Extra Boosters ──
-  { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: false },
+  { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: true  },
   { code: 'EB02',  name: 'Memorial Collection 2',       group: 'extra',   available: false },
   { code: 'EB03',  name: 'Extra Booster 3',             group: 'extra',   available: false },
 ];

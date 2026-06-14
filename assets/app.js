@@ -1,20 +1,53 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 const API_BASE = 'https://treasuretracker-production.up.railway.app';
 
-// All sets in order — add new ones here as you build them out
-// "available: true" means the API has data for this set
-// "available: false" means it's coming soon
 const ALL_SETS = [
-  { code: 'OP01', name: 'Romance Dawn',             available: true  },
-  { code: 'OP02', name: 'Paramount War',            available: true  },
-  { code: 'OP03', name: 'Pillars of Strength',      available: true },
-  { code: 'OP04', name: 'Kingdoms of Intrigue',     available: true },
-  { code: 'OP05', name: 'Awakening of the New Era', available: false },
-  { code: 'OP06', name: 'Wings of the Captain',     available: false },
-  { code: 'EB01', name: 'Memorial Collection',      available: false },
-  { code: 'OP07', name: '500 Years in the Future',  available: false },
-  { code: 'OP08', name: 'Two Legends',              available: false },
-  { code: 'OP09', name: 'The Four Emperors',        available: false },
+  // ── Booster Sets ──
+  { code: 'OP01',  name: 'Romance Dawn',                group: 'booster', available: true  },
+  { code: 'OP02',  name: 'Paramount War',               group: 'booster', available: true  },
+  { code: 'OP03',  name: 'Pillars of Strength',         group: 'booster', available: true  },
+  { code: 'OP04',  name: 'Kingdoms of Intrigue',        group: 'booster', available: true  },
+  { code: 'OP05',  name: 'Awakening of the New Era',    group: 'booster', available: false },
+  { code: 'OP06',  name: 'Wings of the Captain',        group: 'booster', available: false },
+  { code: 'OP07',  name: '500 Years in the Future',     group: 'booster', available: false },
+  { code: 'OP08',  name: 'Two Legends',                 group: 'booster', available: false },
+  { code: 'OP09',  name: 'The Four Emperors',           group: 'booster', available: false },
+  { code: 'OP10',  name: 'Royal Blood',                 group: 'booster', available: false },
+  { code: 'OP11',  name: 'Egghead',                     group: 'booster', available: false },
+  { code: 'OP12',  name: 'Supernovas',                  group: 'booster', available: false },
+  { code: 'OP13',  name: 'Fishman Island',              group: 'booster', available: false },
+  { code: 'OP14',  name: 'The Azure Seas Seven',        group: 'booster', available: false },
+  { code: 'OP15',  name: 'Carrying On His Will',        group: 'booster', available: false },
+  { code: 'OP16',  name: 'Emperors in the New World',   group: 'booster', available: false },
+  { code: 'PRB01', name: 'Premium Booster The Best',    group: 'booster', available: false },
+  { code: 'PRB02', name: 'Premium Booster The Best Vol.2', group: 'booster', available: false },
+  // ── Starter Decks ──
+  { code: 'ST01',  name: 'Straw Hat Crew',              group: 'starter', available: false },
+  { code: 'ST02',  name: 'Worst Generation',            group: 'starter', available: false },
+  { code: 'ST03',  name: 'The Seven Warlords of the Sea', group: 'starter', available: false },
+  { code: 'ST04',  name: 'Animal Kingdom Pirates',      group: 'starter', available: false },
+  { code: 'ST05',  name: 'ONE PIECE FILM RED',          group: 'starter', available: false },
+  { code: 'ST06',  name: 'Absolute Justice',            group: 'starter', available: false },
+  { code: 'ST07',  name: 'Big Mom Pirates',             group: 'starter', available: false },
+  { code: 'ST08',  name: 'Monkey D. Luffy',             group: 'starter', available: false },
+  { code: 'ST09',  name: 'Yamato',                      group: 'starter', available: false },
+  { code: 'ST10',  name: 'Ultra Deck: The Three Captains', group: 'starter', available: false },
+  { code: 'ST11',  name: 'Uta',                         group: 'starter', available: false },
+  { code: 'ST12',  name: 'Zoro & Sanji',                group: 'starter', available: false },
+  { code: 'ST13',  name: 'The Three Brothers',          group: 'starter', available: false },
+  { code: 'ST14',  name: 'Cross Guild',                 group: 'starter', available: false },
+  { code: 'ST15',  name: 'Red Edward Newgate',          group: 'starter', available: false },
+  { code: 'ST16',  name: 'Green Roronoa Zoro',          group: 'starter', available: false },
+  { code: 'ST17',  name: 'Blue Donquixote Doflamingo',  group: 'starter', available: false },
+  { code: 'ST18',  name: 'Purple Monkey D. Luffy',      group: 'starter', available: false },
+  { code: 'ST19',  name: 'Black Smoker',                group: 'starter', available: false },
+  { code: 'ST20',  name: 'Yellow Charlotte Katakuri',   group: 'starter', available: false },
+  { code: 'ST21',  name: 'Red Shanks',                  group: 'starter', available: false },
+  { code: 'ST22',  name: 'Green Monkey D. Luffy',       group: 'starter', available: false },
+  // ── Extra Boosters ──
+  { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: false },
+  { code: 'EB02',  name: 'Memorial Collection 2',       group: 'extra',   available: false },
+  { code: 'EB03',  name: 'Extra Booster 3',             group: 'extra',   available: false },
 ];
 
 const COLOR_BADGE = {
@@ -36,13 +69,14 @@ const RARITY_LABEL = {
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let allCards      = [];
-let activeSets    = new Set(['OP01']); // multi-select, starts with OP01
-let activeColors  = new Set();
-let activeTypes   = new Set();
-let activeRarities= new Set();
-let activeSort    = 'id';
-let searchTerm    = '';
+let allCards       = [];
+let activeSets     = new Set(['OP01']);
+let activeGroup    = 'booster'; // which tab is showing
+let activeColors   = new Set();
+let activeTypes    = new Set();
+let activeRarities = new Set();
+let activeSort     = 'id';
+let searchTerm     = '';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const cardGrid    = document.getElementById('cardGrid');
@@ -59,49 +93,84 @@ const setNav      = document.getElementById('setNav');
 
 // ── Build set nav ─────────────────────────────────────────────────────────────
 function buildSetNav() {
-  const btnHtml = ALL_SETS.map(s => `
+  const groupSets = ALL_SETS.filter(s => s.group === activeGroup);
+
+  setNav.innerHTML = groupSets.map(s => `
     <button
       class="set-btn${activeSets.has(s.code) ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
       data-set="${s.code}"
-      data-available="${s.available}"
       title="${s.name}${!s.available ? ' (coming soon)' : ''}"
     >${s.code}</button>
   `).join('');
 
-  setNav.innerHTML = btnHtml;
+  syncAllBtn();
 
-  const mobileNav = document.getElementById('mobileSetNav');
-  if (mobileNav) mobileNav.innerHTML = btnHtml;
-
-  // Attach listeners to all set buttons (both navs)
-  document.querySelectorAll('.set-btn').forEach(btn => {
+  setNav.querySelectorAll('.set-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const set = ALL_SETS.find(s => s.code === btn.dataset.set);
       if (!set || !set.available) return;
-
-      if (activeSets.has(set.code)) {
-        if (activeSets.size === 1) return;
-        activeSets.delete(set.code);
-      } else {
-        activeSets.add(set.code);
-      }
-
-      // Sync active class on ALL set buttons (both navs)
-      document.querySelectorAll('.set-btn').forEach(b => {
-        b.classList.toggle('active', activeSets.has(b.dataset.set));
-      });
-
+      toggleSet(set.code);
+      btn.classList.toggle('active', activeSets.has(set.code));
+      syncAllBtn();
       loadActiveSets();
     });
   });
+
+  // Group tabs
+  document.querySelectorAll('.set-group-tab').forEach(tab => {
+    tab.onclick = () => {
+      activeGroup = tab.dataset.group;
+      document.querySelectorAll('.set-group-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      buildSetNav();
+    };
+  });
+
+  // All button
+  document.getElementById('setAllBtn').onclick = () => {
+    const availableInAllGroups = ALL_SETS.filter(s => s.available);
+    const allSelected = availableInAllGroups.every(s => activeSets.has(s.code));
+    if (allSelected) {
+      // Deselect all
+      activeSets.clear();
+    } else {
+      // Select all available
+      availableInAllGroups.forEach(s => activeSets.add(s.code));
+    }
+    buildSetNav(); // rebuild to sync button states
+    loadActiveSets();
+  };
+}
+
+function toggleSet(code) {
+  if (activeSets.has(code)) {
+    activeSets.delete(code);
+  } else {
+    activeSets.add(code);
+  }
+}
+
+function syncAllBtn() {
+  const btn = document.getElementById('setAllBtn');
+  if (!btn) return;
+  const available = ALL_SETS.filter(s => s.available);
+  const allSelected = available.length > 0 && available.every(s => activeSets.has(s.code));
+  btn.classList.toggle('active', allSelected);
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 async function loadActiveSets() {
+  const available = ALL_SETS.filter(s => s.available && activeSets.has(s.code));
+
+  if (available.length === 0) {
+    allCards = [];
+    updateHero();
+    showState('coming-soon');
+    return;
+  }
+
   showState('loading');
   updateHero();
-
-  const available = ALL_SETS.filter(s => s.available && activeSets.has(s.code));
 
   try {
     const results = await Promise.all(

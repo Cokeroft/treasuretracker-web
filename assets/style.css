@@ -145,7 +145,7 @@ body {
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
   position: sticky;
-  top: 56px;
+  top: 136px;
   z-index: 40;
 }
 
@@ -462,10 +462,7 @@ body {
 .tcg-link:hover { text-decoration: underline; }
 .tcg-link svg { flex-shrink: 0; }
 
-/* ── Mobile set nav (shown only on mobile) ── */
-.mobile-set-nav {
-  display: none;
-}
+/* ── Mobile set nav (removed — set panel handles this) ── */
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
@@ -505,8 +502,8 @@ body {
   .mobile-set-nav::-webkit-scrollbar { display: none; }
   .mobile-set-nav .set-btn { flex-shrink: 0; }
 
-  /* Filters — stack groups vertically, tighter */
-  .filters-bar { position: static; } /* don't sticky on mobile — takes too much space */
+  /* Filters — static on mobile (sticky panels already take enough space) */
+  .filters-bar { position: static; }
   .filters-inner {
     flex-direction: column;
     align-items: flex-start;
@@ -636,3 +633,101 @@ body {
 }
 
 .badge-set { background: #1e3a2f; color: #6ee7b7; border: 1px solid #065f46; font-weight: 600; }
+
+/* ── Set panel ── */
+.set-panel {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 45;
+}
+
+.set-panel-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Group tabs row */
+.set-group-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.set-group-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 4px 10px 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.set-group-tab:hover { color: var(--text-2); }
+.set-group-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* All button + set buttons row */
+.set-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.set-all-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.set-all-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+}
+
+.set-all-btn:not(.active):hover {
+  border-color: var(--gold-dim);
+  color: var(--text-1);
+}
+
+/* Divider between All btn and set buttons */
+.set-controls::after {
+  content: '';
+  display: none;
+}
+
+.set-btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .set-panel { top: 52px; }
+  .set-panel-inner { padding: 8px 16px; gap: 6px; }
+  .set-group-tab { font-size: 11px; padding: 3px 8px 4px; }
+  .set-btn-group { gap: 4px; }
+  .set-all-btn { font-size: 11px; }
+}

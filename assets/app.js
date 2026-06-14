@@ -6,11 +6,12 @@ const API_BASE = 'https://treasuretracker-production.up.railway.app';
 // "available: false" means it's coming soon
 const ALL_SETS = [
   { code: 'OP01', name: 'Romance Dawn',             available: true  },
-  { code: 'OP02', name: 'Paramount War',            available: true },
+  { code: 'OP02', name: 'Paramount War',            available: true  },
   { code: 'OP03', name: 'Pillars of Strength',      available: false },
   { code: 'OP04', name: 'Kingdoms of Intrigue',     available: false },
   { code: 'OP05', name: 'Awakening of the New Era', available: false },
   { code: 'OP06', name: 'Wings of the Captain',     available: false },
+  { code: 'EB01', name: 'Memorial Collection',      available: false },
   { code: 'OP07', name: '500 Years in the Future',  available: false },
   { code: 'OP08', name: 'Two Legends',              available: false },
   { code: 'OP09', name: 'The Four Emperors',        available: false },
@@ -21,8 +22,8 @@ const COLOR_BADGE = {
   Green:  'badge-green',
   Blue:   'badge-blue',
   Purple: 'badge-purple',
-  Black:  'badge-multi',
-  Yellow: 'badge-multi',
+  Black:  'badge-black',
+  Yellow: 'badge-yellow',
 };
 
 const RARITY_LABEL = {

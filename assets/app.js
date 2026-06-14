@@ -280,19 +280,38 @@ const MISSING_PLACEHOLDER = 'image-missing';
 // All valid image URLs across a card's variants, with the preferred base image first
 function getImageUrls(card) {
   const preferred = getMainImageUrl(card);
-  const all = (card.variants || [])
-    .map(v => v.tcgplayer_image_url)
-    .filter(u => u && !u.includes(MISSING_PLACEHOLDER));
-  if (!preferred) return all;
-  return [preferred, ...all.filter(u => u !== preferred)];
+  const variants  = (card.variants || []).filter(
+    v => v.tcgplayer_image_url && !v.tcgplayer_image_url.includes(MISSING_PLACEHOLDER)
+  );
+
+  // Build an ordered list: preferred first, then other base-set-ish variants, then rest
+  const BASE_METHODS = ['booster_pack', 'starter_deck', 'retail_product'];
+  const baseVariants = variants.filter(v =>
+    BASE_METHODS.includes(v.acquisition?.method) &&
+    v.tcgplayer_image_url !== preferred
+  );
+  const otherVariants = variants.filter(v =>
+    !BASE_METHODS.includes(v.acquisition?.method) &&
+    v.tcgplayer_image_url !== preferred
+  );
+
+  const ordered = [
+    ...(preferred ? [preferred] : []),
+    ...baseVariants.map(v => v.tcgplayer_image_url),
+    ...otherVariants.map(v => v.tcgplayer_image_url),
+  ];
+
+  // Dedupe while preserving order
+  return [...new Set(ordered)];
 }
 
 // Priority order for picking the "hero" display image:
-// Prefer the base set print — Normal from booster/starter, then Parallel, then anything
+// Prefer the base set print — Normal from booster/starter, then Parallel, then Revision Pack, then anything
 const LABEL_PRIORITY = [
   { label: 'normal', methods: ['booster_pack', 'starter_deck'] },
   { label: 'parallel rare', methods: ['booster_pack', 'starter_deck'] },
   { label: 'parallel', methods: ['booster_pack', 'starter_deck'] },
+  { label: 'revision pack', methods: ['retail_product'] },
 ];
 
 function getMainImageUrl(card) {

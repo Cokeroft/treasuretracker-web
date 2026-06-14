@@ -8,7 +8,7 @@ const ALL_SETS = [
   { code: 'OP01', name: 'Romance Dawn',             available: true  },
   { code: 'OP02', name: 'Paramount War',            available: true  },
   { code: 'OP03', name: 'Pillars of Strength',      available: true },
-  { code: 'OP04', name: 'Kingdoms of Intrigue',     available: false },
+  { code: 'OP04', name: 'Kingdoms of Intrigue',     available: true },
   { code: 'OP05', name: 'Awakening of the New Era', available: false },
   { code: 'OP06', name: 'Wings of the Captain',     available: false },
   { code: 'EB01', name: 'Memorial Collection',      available: false },

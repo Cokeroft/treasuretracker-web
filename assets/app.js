@@ -6,7 +6,7 @@ const API_BASE = 'https://treasuretracker-production.up.railway.app';
 // "available: false" means it's coming soon
 const ALL_SETS = [
   { code: 'OP01', name: 'Romance Dawn',             available: true  },
-  { code: 'OP02', name: 'Paramount War',            available: false },
+  { code: 'OP02', name: 'Paramount War',            available: true },
   { code: 'OP03', name: 'Pillars of Strength',      available: false },
   { code: 'OP04', name: 'Kingdoms of Intrigue',     available: false },
   { code: 'OP05', name: 'Awakening of the New Era', available: false },

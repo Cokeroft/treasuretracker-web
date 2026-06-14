@@ -181,9 +181,39 @@ function colorBadgeHtml(colors) {
   return `<span class="badge ${cls}">${colors[0]}</span>`;
 }
 
+const MISSING_PLACEHOLDER = 'image-missing';
+
+// All valid image URLs across a card's variants, in order
+function getImageUrls(card) {
+  return (card.variants || [])
+    .map(v => v.tcgplayer_image_url)
+    .filter(u => u && !u.includes(MISSING_PLACEHOLDER));
+}
+
 function getMainImageUrl(card) {
-  const v = (card.variants || [])[0];
-  return v && v.tcgplayer_image_url ? v.tcgplayer_image_url : null;
+  return getImageUrls(card)[0] || null;
+}
+
+// Attaches a smart fallback chain to an img element.
+// On error OR if TCGPlayer serves their tiny placeholder (naturalWidth < 10),
+// tries the next URL in the list. Falls back to the placeholder HTML when exhausted.
+function attachSmartFallback(img, urls, fallbackHtml) {
+  let idx = 0;
+
+  function tryNext() {
+    idx++;
+    if (idx < urls.length) {
+      img.src = urls[idx];
+    } else {
+      img.parentElement.innerHTML = fallbackHtml;
+    }
+  }
+
+  img.addEventListener('load', () => {
+    // TCGPlayer's missing image SVG loads as a 1px image
+    if (img.naturalWidth > 0 && img.naturalWidth < 10) tryNext();
+  });
+  img.addEventListener('error', tryNext);
 }
 
 // Fix: use a data attribute + delegated JS handler instead of inline onerror
@@ -229,11 +259,11 @@ function render() {
     });
   });
 
-  // Handle broken images via event delegation (no inline onerror needed)
+  // Attach smart fallback to card grid images
   cardGrid.querySelectorAll('img[data-fallback]').forEach(img => {
-    img.addEventListener('error', function() {
-      this.parentElement.innerHTML = `<div class="card-img-ph">${cardIconSvg()}</div>`;
-    });
+    const card = allCards.find(c => c.id === img.closest('.card').dataset.id);
+    const urls = card ? getImageUrls(card) : [];
+    attachSmartFallback(img, urls, `<div class="card-img-ph">${cardIconSvg()}</div>`);
   });
 }
 
@@ -245,15 +275,16 @@ function openCard(cardId) {
   document.getElementById('mTitle').textContent = card.name || card.id;
   document.getElementById('mSub').textContent = `${card.id} · ${card.type || ''} · ${(card.color || []).join('/')}`;
 
-  const mainImg = getMainImageUrl(card);
+  const allImgUrls = getImageUrls(card);
   const mImg    = document.getElementById('mImg');
   const mImgPh  = document.getElementById('mImgPh');
-  if (mainImg) {
-    mImg.src = mainImg;
+  if (allImgUrls.length) {
+    mImg.src = allImgUrls[0];
     mImg.alt = card.name || card.id;
     mImg.style.display = 'block';
     mImgPh.style.display = 'none';
-    mImg.onerror = () => { mImg.style.display = 'none'; mImgPh.style.display = 'flex'; };
+    attachSmartFallback(mImg, allImgUrls, '');
+    mImg.addEventListener('error', () => { mImg.style.display = 'none'; mImgPh.style.display = 'flex'; }, { once: true });
   } else {
     mImg.style.display = 'none';
     mImgPh.style.display = 'flex';
@@ -312,11 +343,9 @@ function openCard(cardId) {
     </div>`;
   }).join('');
 
-  // Fallback for broken variant images
+  // Fallback for variant images (each variant only has one URL, so just handle missing)
   document.querySelectorAll('#vGrid img[data-fallback]').forEach(img => {
-    img.addEventListener('error', function() {
-      this.parentElement.innerHTML = `<div class="variant-img-ph">${cardIconSvg()}</div>`;
-    });
+    attachSmartFallback(img, [img.src], `<div class="variant-img-ph">${cardIconSvg()}</div>`);
   });
 
   overlay.style.display = 'flex';

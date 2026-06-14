@@ -369,7 +369,7 @@ body {
 }
 
 .main-img-wrap {
-  width: 130px;
+  width: 200px;
   flex-shrink: 0;
   border-radius: var(--radius-md);
   overflow: hidden;

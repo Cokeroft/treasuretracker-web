@@ -288,8 +288,12 @@ function getImageUrls(card) {
 }
 
 // Priority order for picking the "hero" display image:
-// Normal base print first, then parallel, then anything else
-const LABEL_PRIORITY = ['normal', 'parallel rare', 'parallel'];
+// Prefer the base set print — Normal from booster/starter, then Parallel, then anything
+const LABEL_PRIORITY = [
+  { label: 'normal', methods: ['booster_pack', 'starter_deck'] },
+  { label: 'parallel rare', methods: ['booster_pack', 'starter_deck'] },
+  { label: 'parallel', methods: ['booster_pack', 'starter_deck'] },
+];
 
 function getMainImageUrl(card) {
   const variants = (card.variants || []).filter(
@@ -298,10 +302,10 @@ function getMainImageUrl(card) {
   if (!variants.length) return null;
 
   // Try to find a base set print first
-  for (const priority of LABEL_PRIORITY) {
+  for (const { label, methods } of LABEL_PRIORITY) {
     const match = variants.find(v =>
-      (v.label || '').toLowerCase().startsWith(priority) &&
-      (v.acquisition?.method === 'booster_pack' || v.acquisition?.method === 'starter_deck')
+      (v.label || '').toLowerCase().startsWith(label) &&
+      methods.includes(v.acquisition?.method)
     );
     if (match) return match.tcgplayer_image_url;
   }

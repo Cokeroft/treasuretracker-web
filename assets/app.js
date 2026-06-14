@@ -59,7 +59,7 @@ const setNav      = document.getElementById('setNav');
 
 // ── Build set nav ─────────────────────────────────────────────────────────────
 function buildSetNav() {
-  setNav.innerHTML = ALL_SETS.map(s => `
+  const btnHtml = ALL_SETS.map(s => `
     <button
       class="set-btn${activeSets.has(s.code) ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
       data-set="${s.code}"
@@ -68,22 +68,28 @@ function buildSetNav() {
     >${s.code}</button>
   `).join('');
 
-  setNav.querySelectorAll('.set-btn').forEach(btn => {
+  setNav.innerHTML = btnHtml;
+
+  const mobileNav = document.getElementById('mobileSetNav');
+  if (mobileNav) mobileNav.innerHTML = btnHtml;
+
+  // Attach listeners to all set buttons (both navs)
+  document.querySelectorAll('.set-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const set = ALL_SETS.find(s => s.code === btn.dataset.set);
       if (!set || !set.available) return;
 
-      // Toggle this set
       if (activeSets.has(set.code)) {
-        // Don't allow deselecting the last set
         if (activeSets.size === 1) return;
         activeSets.delete(set.code);
       } else {
         activeSets.add(set.code);
       }
 
-      // Sync active class
-      btn.classList.toggle('active', activeSets.has(set.code));
+      // Sync active class on ALL set buttons (both navs)
+      document.querySelectorAll('.set-btn').forEach(b => {
+        b.classList.toggle('active', activeSets.has(b.dataset.set));
+      });
 
       loadActiveSets();
     });

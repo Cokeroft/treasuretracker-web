@@ -462,15 +462,99 @@ body {
 .tcg-link:hover { text-decoration: underline; }
 .tcg-link svg { flex-shrink: 0; }
 
+/* ── Mobile set nav (shown only on mobile) ── */
+.mobile-set-nav {
+  display: none;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
-  .topbar-inner { gap: 12px; }
+
+  /* Topbar — logo + search only, no set nav */
+  .topbar-inner {
+    gap: 10px;
+    padding: 0 16px;
+    height: 52px;
+  }
+
+  .logo { font-size: 15px; }
+  .logo svg { width: 18px; height: 18px; }
+
+  /* Full-width search */
+  .search-wrap { max-width: none; flex: 1; }
+
+  /* Hide desktop set nav */
   .set-nav { display: none; }
-  .search-wrap { max-width: none; }
-  .card-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-  .card-overview { flex-direction: column; }
-  .main-img-wrap { width: 100%; max-width: 160px; }
-  .filters-inner { gap: 6px; }
+
+  /* Hero */
+  .hero { padding: 16px 16px 12px; }
+  .hero h1 { font-size: 20px; }
+
+  /* Mobile set nav — horizontal scrolling strip */
+  .mobile-set-nav {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    /* Hide scrollbar but keep scrollability */
+    scrollbar-width: none;
+  }
+  .mobile-set-nav::-webkit-scrollbar { display: none; }
+  .mobile-set-nav .set-btn { flex-shrink: 0; }
+
+  /* Filters — stack groups vertically, tighter */
+  .filters-bar { position: static; } /* don't sticky on mobile — takes too much space */
+  .filters-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 16px;
+  }
+
+  /* Each filter row: label + pills on same line */
+  .filter-label { margin-left: 0 !important; font-size: 11px; white-space: nowrap; }
+
+  .pills { flex-wrap: wrap; gap: 5px; }
+  .pill  { font-size: 11px; padding: 3px 9px; }
+
+  /* Sort select full width */
+  .sort-select { width: 100%; margin-left: 0; }
+
+  /* Card grid — 2 columns, tighter gap */
+  .main-content { padding: 12px 12px 48px; }
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card-body { padding: 7px 8px; }
+  .card-name { font-size: 12px; }
+  .card-id   { font-size: 9px; }
+  .badge     { font-size: 9px; padding: 1px 5px; }
+
+  /* Modal — full screen on mobile */
+  .overlay { padding: 0; align-items: flex-end; }
+
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: none;
+  }
+
+  .modal-header { padding: 12px 16px; }
+  .modal-title  { font-size: 16px; }
+  .modal-body   { padding: 14px 16px; }
+
+  /* Card overview in modal — side by side but smaller image */
+  .card-overview { gap: 12px; }
+  .main-img-wrap { width: 100px; flex-shrink: 0; }
+
+  /* Variant grid — 2 columns on mobile */
+  .variants-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }
 
 /* ── Set nav ── */

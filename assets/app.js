@@ -22,7 +22,7 @@ const ALL_SETS = [
   { code: 'PRB01', name: 'Premium Booster The Best',    group: 'booster', available: false },
   { code: 'PRB02', name: 'Premium Booster The Best Vol.2', group: 'booster', available: false },
   // ── Starter Decks ──
-  { code: 'ST01',  name: 'Straw Hat Crew',                  group: 'starter', available: false },
+  { code: 'ST01',  name: 'Straw Hat Crew',                  group: 'starter', available: true  },
   { code: 'ST02',  name: 'Worst Generation',                group: 'starter', available: false },
   { code: 'ST03',  name: 'The Seven Warlords of the Sea',   group: 'starter', available: false },
   { code: 'ST04',  name: 'Animal Kingdom Pirates',          group: 'starter', available: false },

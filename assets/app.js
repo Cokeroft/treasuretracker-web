@@ -1,17 +1,20 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 const API_BASE = 'https://treasuretracker-production.up.railway.app';
 
-const SET_NAMES = {
-  OP01: 'Romance Dawn',
-  OP02: 'Paramount War',
-  OP03: 'Pillars of Strength',
-  OP04: 'Kingdoms of Intrigue',
-  OP05: 'Awakening of the New Era',
-  OP06: 'Wings of the Captain',
-  OP07: '500 Years in the Future',
-  OP08: 'Two Legends',
-  OP09: 'The Four Emperors',
-};
+// All sets in order — add new ones here as you build them out
+// "available: true" means the API has data for this set
+// "available: false" means it's coming soon
+const ALL_SETS = [
+  { code: 'OP01', name: 'Romance Dawn',             available: true  },
+  { code: 'OP02', name: 'Paramount War',            available: false },
+  { code: 'OP03', name: 'Pillars of Strength',      available: false },
+  { code: 'OP04', name: 'Kingdoms of Intrigue',     available: false },
+  { code: 'OP05', name: 'Awakening of the New Era', available: false },
+  { code: 'OP06', name: 'Wings of the Captain',     available: false },
+  { code: 'OP07', name: '500 Years in the Future',  available: false },
+  { code: 'OP08', name: 'Two Legends',              available: false },
+  { code: 'OP09', name: 'The Four Emperors',        available: false },
+];
 
 const COLOR_BADGE = {
   Red:    'badge-red',
@@ -32,27 +35,68 @@ const RARITY_LABEL = {
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let allCards      = [];
-let activeSet     = 'OP01';
-let activeColor   = 'all';
-let activeType    = 'all';
-let activeSort    = 'id';
-let searchTerm    = '';
+let allCards    = [];
+let activeSet   = 'OP01';
+let activeColor = 'all';
+let activeType  = 'all';
+let activeSort  = 'id';
+let searchTerm  = '';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const cardGrid    = document.getElementById('cardGrid');
 const loadingMsg  = document.getElementById('loadingMsg');
 const errorMsg    = document.getElementById('errorMsg');
 const emptyMsg    = document.getElementById('emptyMsg');
+const comingSoon  = document.getElementById('comingSoon');
 const heroTitle   = document.getElementById('heroTitle');
 const heroSub     = document.getElementById('heroSub');
 const searchInput = document.getElementById('searchInput');
 const sortSelect  = document.getElementById('sortSelect');
 const overlay     = document.getElementById('overlay');
+const setNav      = document.getElementById('setNav');
+
+// ── Build set nav ─────────────────────────────────────────────────────────────
+function buildSetNav() {
+  setNav.innerHTML = ALL_SETS.map(s => `
+    <button
+      class="set-btn${s.code === activeSet ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
+      data-set="${s.code}"
+      data-available="${s.available}"
+      title="${s.name}${!s.available ? ' (coming soon)' : ''}"
+    >${s.code}</button>
+  `).join('');
+
+  setNav.querySelectorAll('.set-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const set = ALL_SETS.find(s => s.code === btn.dataset.set);
+      if (!set) return;
+
+      setNav.querySelectorAll('.set-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSet = set.code;
+
+      // Reset filters
+      activeColor = 'all';
+      activeType  = 'all';
+      searchTerm  = '';
+      searchInput.value = '';
+      document.querySelectorAll('.pill[data-filter]').forEach((p, i) => p.classList.toggle('active', i === 0));
+      document.querySelectorAll('.pill[data-type]').forEach((p, i)   => p.classList.toggle('active', i === 0));
+
+      if (set.available) {
+        loadSet(set.code);
+      } else {
+        showComingSoon(set);
+      }
+    });
+  });
+}
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 async function loadSet(setCode) {
+  const set = ALL_SETS.find(s => s.code === setCode);
   showState('loading');
+  updateHero(set, null);
   document.getElementById('apiUrlDisplay').textContent = `${API_BASE}/sets/${setCode}/cards`;
 
   try {
@@ -62,10 +106,7 @@ async function loadSet(setCode) {
     allCards = data.cards || [];
 
     const totalVariants = allCards.reduce((sum, c) => sum + (c.variants || []).length, 0);
-    const setName = SET_NAMES[setCode] || setCode;
-
-    heroTitle.innerHTML = `${setName} <span class="set-code">${setCode}</span>`;
-    heroSub.textContent = `${allCards.length} cards · ${totalVariants} variants · click any card to see all prints`;
+    updateHero(set, { cards: allCards.length, variants: totalVariants });
 
     showState('grid');
     render();
@@ -75,11 +116,30 @@ async function loadSet(setCode) {
   }
 }
 
+function showComingSoon(set) {
+  allCards = [];
+  updateHero(set, null);
+  showState('coming-soon');
+}
+
+function updateHero(set, stats) {
+  if (!set) return;
+  heroTitle.innerHTML = `${set.name} <span class="set-code">${set.code}</span>`;
+  if (stats) {
+    heroSub.textContent = `${stats.cards} cards · ${stats.variants} variants · click any card to see all prints`;
+  } else if (!set.available) {
+    heroSub.textContent = 'This set hasn\'t been added yet — check back soon.';
+  } else {
+    heroSub.textContent = 'Loading...';
+  }
+}
+
 function showState(state) {
-  loadingMsg.style.display = state === 'loading' ? 'flex' : 'none';
-  errorMsg.style.display   = state === 'error'   ? 'flex' : 'none';
-  emptyMsg.style.display   = state === 'empty'   ? 'flex' : 'none';
-  cardGrid.style.display   = state === 'grid'    ? 'grid' : 'none';
+  loadingMsg.style.display   = state === 'loading'      ? 'flex'  : 'none';
+  errorMsg.style.display     = state === 'error'        ? 'flex'  : 'none';
+  emptyMsg.style.display     = state === 'empty'        ? 'flex'  : 'none';
+  comingSoon.style.display   = state === 'coming-soon'  ? 'flex'  : 'none';
+  cardGrid.style.display     = state === 'grid'         ? 'grid'  : 'none';
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -126,16 +186,17 @@ function getMainImageUrl(card) {
   return v && v.tcgplayer_image_url ? v.tcgplayer_image_url : null;
 }
 
+// Fix: use a data attribute + delegated JS handler instead of inline onerror
 function cardHtml(card) {
   const img = getMainImageUrl(card);
   const variantCount = (card.variants || []).length;
 
   const imgHtml = img
-    ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${escHtml(card.name || card.id)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-img-ph\\'>${cardIconSvg()}</div>'"></div>`
+    ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${escHtml(card.name || card.id)}" loading="lazy" data-fallback="1"></div>`
     : `<div class="card-img-wrap"><div class="card-img-ph">${cardIconSvg()}</div></div>`;
 
   return `
-    <article class="card" onclick="openCard('${card.id}')" tabindex="0" role="button" aria-label="View ${escHtml(card.name || card.id)} variants">
+    <article class="card" data-id="${card.id}" tabindex="0" role="button" aria-label="View ${escHtml(card.name || card.id)} variants">
       ${imgHtml}
       <div class="card-body">
         <div class="card-id">${card.id}</div>
@@ -160,13 +221,18 @@ function render() {
   showState('grid');
   cardGrid.innerHTML = cards.map(cardHtml).join('');
 
-  // keyboard support
+  // Attach click + keyboard handlers
   cardGrid.querySelectorAll('.card').forEach(el => {
+    el.addEventListener('click', () => openCard(el.dataset.id));
     el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        el.click();
-      }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCard(el.dataset.id); }
+    });
+  });
+
+  // Handle broken images via event delegation (no inline onerror needed)
+  cardGrid.querySelectorAll('img[data-fallback]').forEach(img => {
+    img.addEventListener('error', function() {
+      this.parentElement.innerHTML = `<div class="card-img-ph">${cardIconSvg()}</div>`;
     });
   });
 }
@@ -176,11 +242,9 @@ function openCard(cardId) {
   const card = allCards.find(c => c.id === cardId);
   if (!card) return;
 
-  // Header
   document.getElementById('mTitle').textContent = card.name || card.id;
   document.getElementById('mSub').textContent = `${card.id} · ${card.type || ''} · ${(card.color || []).join('/')}`;
 
-  // Main image
   const mainImg = getMainImageUrl(card);
   const mImg    = document.getElementById('mImg');
   const mImgPh  = document.getElementById('mImgPh');
@@ -189,33 +253,31 @@ function openCard(cardId) {
     mImg.alt = card.name || card.id;
     mImg.style.display = 'block';
     mImgPh.style.display = 'none';
+    mImg.onerror = () => { mImg.style.display = 'none'; mImgPh.style.display = 'flex'; };
   } else {
     mImg.style.display = 'none';
     mImgPh.style.display = 'flex';
   }
 
-  // Attributes
   const attrRows = [
     ['Type',      card.type      || '—'],
     ['Color',     (card.color || []).join(', ') || '—'],
     ['Rarity',    RARITY_LABEL[card.rarity] || card.rarity || '—'],
     ['Power',     card.power != null ? card.power.toLocaleString() : '—'],
     ['Attribute', card.attribute || '—'],
-    card.cost  != null ? ['Cost',  card.cost]  :
-    card.life  != null ? ['Life',  card.life]  : ['', ''],
-  ].filter(([l]) => l);
+    card.cost != null ? ['Cost', card.cost] :
+    card.life != null ? ['Life', card.life] : null,
+  ].filter(Boolean);
 
-  document.getElementById('mAttrs').innerHTML = attrRows.map(([l, v]) =>
+  let attrsHtml = attrRows.map(([l, v]) =>
     `<div><div class="attr-label">${l}</div><div class="attr-val">${escHtml(String(v))}</div></div>`
   ).join('');
 
-  // Affiliations row
   if (card.affiliations && card.affiliations.length) {
-    document.getElementById('mAttrs').innerHTML +=
-      `<div style="grid-column:1/-1"><div class="attr-label">Affiliations</div><div class="attr-val" style="font-size:13px">${escHtml(card.affiliations.join(', '))}</div></div>`;
+    attrsHtml += `<div style="grid-column:1/-1"><div class="attr-label">Affiliations</div><div class="attr-val" style="font-size:13px">${escHtml(card.affiliations.join(', '))}</div></div>`;
   }
+  document.getElementById('mAttrs').innerHTML = attrsHtml;
 
-  // Effect
   const effectWrap = document.getElementById('mEffectWrap');
   if (card.effect) {
     document.getElementById('mEffect').textContent = card.effect;
@@ -224,37 +286,38 @@ function openCard(cardId) {
     effectWrap.style.display = 'none';
   }
 
-  // Variants
   const variants = card.variants || [];
   document.getElementById('vHeading').textContent = `${variants.length} variant${variants.length !== 1 ? 's' : ''}`;
 
   document.getElementById('vGrid').innerHTML = variants.map(v => {
-    const vi = v.tcgplayer_image_url
-      ? `<div class="variant-img-wrap"><img class="variant-img" src="${v.tcgplayer_image_url}" alt="${escHtml(v.label)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'variant-img-ph\\'>${cardIconSvg()}</div>'"></div>`
-      : `<div class="variant-img-wrap"><div class="variant-img-ph">${cardIconSvg()}</div></div>`;
-
     const method = v.acquisition && v.acquisition.method
       ? v.acquisition.method.replace(/_/g, ' ')
       : '';
-
     const link = v.tcgplayer_url
-      ? `<a class="tcg-link" href="${v.tcgplayer_url}" target="_blank" rel="noopener">
-           TCGPlayer
-           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-         </a>`
+      ? `<a class="tcg-link" href="${v.tcgplayer_url}" target="_blank" rel="noopener">TCGPlayer ${externalLinkSvg()}</a>`
       : '';
 
-    return `
-      <div class="variant-card">
-        ${vi}
-        <div class="variant-info">
-          <div class="variant-label">${escHtml(v.label)}</div>
-          <div class="variant-finish">${escHtml(v.finish || '')}</div>
-          ${method ? `<div class="variant-method">${escHtml(method)}</div>` : ''}
-          ${link}
-        </div>
-      </div>`;
+    return `<div class="variant-card" data-img="${v.tcgplayer_image_url || ''}">
+      <div class="variant-img-wrap">
+        ${v.tcgplayer_image_url
+          ? `<img class="variant-img" src="${v.tcgplayer_image_url}" alt="${escHtml(v.label)}" loading="lazy" data-fallback="1">`
+          : `<div class="variant-img-ph">${cardIconSvg()}</div>`}
+      </div>
+      <div class="variant-info">
+        <div class="variant-label">${escHtml(v.label)}</div>
+        <div class="variant-finish">${escHtml(v.finish || '')}</div>
+        ${method ? `<div class="variant-method">${escHtml(method)}</div>` : ''}
+        ${link}
+      </div>
+    </div>`;
   }).join('');
+
+  // Fallback for broken variant images
+  document.querySelectorAll('#vGrid img[data-fallback]').forEach(img => {
+    img.addEventListener('error', function() {
+      this.parentElement.innerHTML = `<div class="variant-img-ph">${cardIconSvg()}</div>`;
+    });
+  });
 
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -268,26 +331,14 @@ function closeModal() {
 
 // ── Event listeners ───────────────────────────────────────────────────────────
 document.getElementById('closeBtn').addEventListener('click', closeModal);
-
-overlay.addEventListener('click', e => {
-  if (e.target === overlay) closeModal();
-});
-
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && overlay.style.display === 'flex') closeModal();
 });
 
-searchInput.addEventListener('input', e => {
-  searchTerm = e.target.value.trim();
-  render();
-});
+searchInput.addEventListener('input', e => { searchTerm = e.target.value.trim(); render(); });
+sortSelect.addEventListener('change', e => { activeSort = e.target.value; render(); });
 
-sortSelect.addEventListener('change', e => {
-  activeSort = e.target.value;
-  render();
-});
-
-// Color filter pills
 document.querySelectorAll('.pill[data-filter]').forEach(pill => {
   pill.addEventListener('click', () => {
     document.querySelectorAll('.pill[data-filter]').forEach(p => p.classList.remove('active'));
@@ -297,29 +348,12 @@ document.querySelectorAll('.pill[data-filter]').forEach(pill => {
   });
 });
 
-// Type filter pills
 document.querySelectorAll('.pill[data-type]').forEach(pill => {
   pill.addEventListener('click', () => {
     document.querySelectorAll('.pill[data-type]').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
     activeType = pill.dataset.type;
     render();
-  });
-});
-
-// Set switcher
-document.querySelectorAll('.set-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.set-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeSet = btn.dataset.set;
-    activeColor = 'all';
-    activeType = 'all';
-    searchTerm = '';
-    searchInput.value = '';
-    document.querySelectorAll('.pill[data-filter]').forEach((p, i) => p.classList.toggle('active', i === 0));
-    document.querySelectorAll('.pill[data-type]').forEach((p, i) => p.classList.toggle('active', i === 0));
-    loadSet(activeSet);
   });
 });
 
@@ -336,5 +370,10 @@ function cardIconSvg() {
   return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>`;
 }
 
+function externalLinkSvg() {
+  return `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
+buildSetNav();
 loadSet(activeSet);

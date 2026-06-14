@@ -14,17 +14,15 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         TreasureTracker
       </div>
       <div class="search-wrap">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Search by name or card ID (e.g. OP01-001)..." aria-label="Search cards">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by name or card ID..." aria-label="Search cards">
       </div>
-      <nav class="set-nav">
-        <button class="set-btn active" data-set="OP01">OP01</button>
-        <!-- Add more sets here as you build them out -->
-      </nav>
+      <!-- Set nav is built dynamically by app.js -->
+      <nav class="set-nav" id="setNav" aria-label="Select set"></nav>
     </div>
   </header>
 
@@ -45,7 +43,7 @@
         <button class="pill" data-filter="Blue">Blue</button>
         <button class="pill" data-filter="Purple">Purple</button>
       </div>
-      <span class="filter-label" style="margin-left: 12px">Type</span>
+      <span class="filter-label" style="margin-left:12px">Type</span>
       <div class="pills" role="group" aria-label="Filter by type">
         <button class="pill active" data-type="all">All</button>
         <button class="pill" data-type="Leader">Leader</button>
@@ -61,7 +59,7 @@
     </div>
   </div>
 
-  <!-- ── Card Grid ── -->
+  <!-- ── Main content ── -->
   <main class="main-content">
     <div id="loadingMsg" class="state-msg">
       <div class="spinner"></div>
@@ -71,7 +69,14 @@
       Could not load cards. Make sure your API is running at:<br>
       <code id="apiUrlDisplay"></code>
     </div>
-    <div id="emptyMsg" class="state-msg" style="display:none">No cards match your search.</div>
+    <div id="emptyMsg" class="state-msg" style="display:none">
+      No cards match your search.
+    </div>
+    <div id="comingSoon" class="state-msg coming-soon" style="display:none">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="coming-soon-title">Coming soon</div>
+      <div class="coming-soon-sub">This set hasn't been added yet. Run the scraper then drop in the JSON file to unlock it.</div>
+    </div>
     <div id="cardGrid" class="card-grid" style="display:none"></div>
   </main>
 
@@ -90,19 +95,17 @@
       <div class="modal-body">
         <div class="card-overview">
           <div class="main-img-wrap">
-            <img id="mImg" src="" alt="" class="main-img" style="display:none" onerror="this.style.display='none'">
+            <img id="mImg" src="" alt="" class="main-img" style="display:none">
             <div id="mImgPh" class="main-img-ph">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
             </div>
           </div>
           <div class="card-attrs" id="mAttrs"></div>
         </div>
-
         <div class="effect-section" id="mEffectWrap" style="display:none">
           <div class="effect-label">Card effect</div>
           <p class="effect-text" id="mEffect"></p>
         </div>
-
         <h3 class="variants-heading" id="vHeading"></h3>
         <div class="variants-grid" id="vGrid"></div>
       </div>

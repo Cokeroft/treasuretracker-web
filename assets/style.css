@@ -472,3 +472,74 @@ body {
   .main-img-wrap { width: 100%; max-width: 160px; }
   .filters-inner { gap: 6px; }
 }
+
+/* ── Set nav ── */
+.set-nav {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.set-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.set-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+}
+
+.set-btn:not(.active):not(.unavailable):hover {
+  border-color: var(--text-3);
+  color: var(--text-1);
+}
+
+.set-btn.unavailable {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.set-btn.unavailable:hover {
+  background: var(--bg-input);
+  border-color: var(--border-mid);
+  color: var(--text-2);
+}
+
+/* ── Coming soon state ── */
+.state-msg.coming-soon {
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-3);
+  padding: 80px 24px;
+}
+
+.coming-soon svg {
+  color: var(--gold-dim);
+  opacity: 0.5;
+}
+
+.coming-soon-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.coming-soon-sub {
+  font-size: 14px;
+  color: var(--text-3);
+  max-width: 380px;
+  text-align: center;
+  line-height: 1.6;
+}

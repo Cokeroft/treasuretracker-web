@@ -206,7 +206,7 @@ function getMainImageUrl(card) {
   // Try to find a base set print first
   for (const priority of LABEL_PRIORITY) {
     const match = variants.find(v =>
-      (v.label || '').toLowerCase() === priority &&
+      (v.label || '').toLowerCase().startsWith(priority) &&
       (v.acquisition?.method === 'booster_pack' || v.acquisition?.method === 'starter_deck')
     );
     if (match) return match.tcgplayer_image_url;

@@ -320,7 +320,11 @@ function getMainImageUrl(card) {
   );
   if (!variants.length) return null;
 
-  // Try to find a base set print first
+  // If a Revision Pack variant exists, always prefer it — it has the cleanest image
+  const revision = variants.find(v => v.label === 'Revision Pack');
+  if (revision) return revision.tcgplayer_image_url;
+
+  // Otherwise prefer base set Normal/Parallel
   for (const { label, methods } of LABEL_PRIORITY) {
     const match = variants.find(v =>
       (v.label || '').toLowerCase().startsWith(label) &&
@@ -329,7 +333,6 @@ function getMainImageUrl(card) {
     if (match) return match.tcgplayer_image_url;
   }
 
-  // Fall back to first available
   return variants[0].tcgplayer_image_url;
 }
 

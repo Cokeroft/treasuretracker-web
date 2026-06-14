@@ -550,3 +550,5 @@ body {
 .pill.active + .pill.active {
   border-left-color: var(--gold);
 }
+
+.badge-set { background: #1e3a2f; color: #6ee7b7; border: 1px solid #065f46; font-weight: 600; }

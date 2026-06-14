@@ -37,10 +37,10 @@ const RARITY_LABEL = {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let allCards      = [];
-let activeSet     = 'OP01';
-let activeColors  = new Set();  // empty = All
-let activeTypes   = new Set();  // empty = All
-let activeRarities= new Set();  // empty = All
+let activeSets    = new Set(['OP01']); // multi-select, starts with OP01
+let activeColors  = new Set();
+let activeTypes   = new Set();
+let activeRarities= new Set();
 let activeSort    = 'id';
 let searchTerm    = '';
 
@@ -61,7 +61,7 @@ const setNav      = document.getElementById('setNav');
 function buildSetNav() {
   setNav.innerHTML = ALL_SETS.map(s => `
     <button
-      class="set-btn${s.code === activeSet ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
+      class="set-btn${activeSets.has(s.code) ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
       data-set="${s.code}"
       data-available="${s.available}"
       title="${s.name}${!s.available ? ' (coming soon)' : ''}"
@@ -71,47 +71,43 @@ function buildSetNav() {
   setNav.querySelectorAll('.set-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const set = ALL_SETS.find(s => s.code === btn.dataset.set);
-      if (!set) return;
+      if (!set || !set.available) return;
 
-      setNav.querySelectorAll('.set-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeSet = set.code;
-
-      // Reset filters
-      activeColors.clear();
-      activeTypes.clear();
-      activeRarities.clear();
-      searchTerm    = '';
-      searchInput.value = '';
-      document.querySelectorAll('.pill[data-group]').forEach(p => {
-        p.classList.toggle('active', p.dataset.value === 'all');
-      });
-
-      if (set.available) {
-        loadSet(set.code);
+      // Toggle this set
+      if (activeSets.has(set.code)) {
+        // Don't allow deselecting the last set
+        if (activeSets.size === 1) return;
+        activeSets.delete(set.code);
       } else {
-        showComingSoon(set);
+        activeSets.add(set.code);
       }
+
+      // Sync active class
+      btn.classList.toggle('active', activeSets.has(set.code));
+
+      loadActiveSets();
     });
   });
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
-async function loadSet(setCode) {
-  const set = ALL_SETS.find(s => s.code === setCode);
+async function loadActiveSets() {
   showState('loading');
-  updateHero(set, null);
-  document.getElementById('apiUrlDisplay').textContent = `${API_BASE}/sets/${setCode}/cards`;
+  updateHero();
+
+  const available = ALL_SETS.filter(s => s.available && activeSets.has(s.code));
 
   try {
-    const res = await fetch(`${API_BASE}/sets/${setCode}/cards`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    allCards = data.cards || [];
+    const results = await Promise.all(
+      available.map(s =>
+        fetch(`${API_BASE}/sets/${s.code}/cards`)
+          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+          .then(d => d.cards || [])
+      )
+    );
 
-    const totalVariants = allCards.reduce((sum, c) => sum + (c.variants || []).length, 0);
-    updateHero(set, { cards: allCards.length, variants: totalVariants });
-
+    allCards = results.flat();
+    updateHero();
     showState('grid');
     render();
   } catch (err) {
@@ -120,19 +116,26 @@ async function loadSet(setCode) {
   }
 }
 
-function showComingSoon(set) {
-  allCards = [];
-  updateHero(set, null);
-  showState('coming-soon');
-}
+function updateHero() {
+  const selected = ALL_SETS.filter(s => activeSets.has(s.code) && s.available);
 
-function updateHero(set, stats) {
-  if (!set) return;
-  heroTitle.innerHTML = `${set.name} <span class="set-code">${set.code}</span>`;
-  if (stats) {
-    heroSub.textContent = `${stats.cards} cards · ${stats.variants} variants · click any card to see all prints`;
-  } else if (!set.available) {
-    heroSub.textContent = 'This set hasn\'t been added yet — check back soon.';
+  if (selected.length === 0) {
+    heroTitle.innerHTML = 'TreasureTracker';
+    heroSub.textContent = '';
+    return;
+  }
+
+  if (selected.length === 1) {
+    const s = selected[0];
+    heroTitle.innerHTML = `${s.name} <span class="set-code">${s.code}</span>`;
+  } else {
+    const codes = selected.map(s => s.code).join(' + ');
+    heroTitle.innerHTML = `${selected.length} sets <span class="set-code">${codes}</span>`;
+  }
+
+  if (allCards.length > 0) {
+    const totalVariants = allCards.reduce((sum, c) => sum + (c.variants || []).length, 0);
+    heroSub.textContent = `${allCards.length} cards · ${totalVariants} variants · click any card to see all prints`;
   } else {
     heroSub.textContent = 'Loading...';
   }
@@ -264,6 +267,7 @@ function cardHtml(card) {
         <div class="card-meta">
           ${colorBadgeHtml(card.color)}
           <span class="badge badge-gray">${RARITY_LABEL[card.rarity] || card.rarity || '—'}</span>
+          ${activeSets.size > 1 ? `<span class="badge badge-set">${card.set || card.id.split('-')[0]}</span>` : ''}
           <span class="badge badge-gray">${variantCount} variant${variantCount !== 1 ? 's' : ''}</span>
         </div>
       </div>
@@ -458,4 +462,4 @@ function externalLinkSvg() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 buildSetNav();
-loadSet(activeSet);
+loadActiveSets();

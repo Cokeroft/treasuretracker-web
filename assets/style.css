@@ -545,3 +545,8 @@ body {
 }
 .badge-black  { background: #1a1a2e; color: #a0aec0; border: 1px solid #374151; }
 .badge-yellow { background: #713f12; color: #fde68a; }
+
+/* ── Multi-select pill — when active alongside others in same group ── */
+.pill.active + .pill.active {
+  border-left-color: var(--gold);
+}

@@ -37,21 +37,31 @@
     <div class="filters-inner">
       <span class="filter-label">Color</span>
       <div class="pills" role="group" aria-label="Filter by color">
-        <button class="pill active" data-filter="all">All</button>
-        <button class="pill" data-filter="Red">Red</button>
-        <button class="pill" data-filter="Green">Green</button>
-        <button class="pill" data-filter="Blue">Blue</button>
-        <button class="pill" data-filter="Purple">Purple</button>
-        <button class="pill" data-filter="Black">Black</button>
-        <button class="pill" data-filter="Yellow">Yellow</button>
+        <button class="pill active" data-group="color" data-value="all">All</button>
+        <button class="pill" data-group="color" data-value="Red">Red</button>
+        <button class="pill" data-group="color" data-value="Green">Green</button>
+        <button class="pill" data-group="color" data-value="Blue">Blue</button>
+        <button class="pill" data-group="color" data-value="Purple">Purple</button>
+        <button class="pill" data-group="color" data-value="Black">Black</button>
+        <button class="pill" data-group="color" data-value="Yellow">Yellow</button>
       </div>
       <span class="filter-label" style="margin-left:12px">Type</span>
       <div class="pills" role="group" aria-label="Filter by type">
-        <button class="pill active" data-type="all">All</button>
-        <button class="pill" data-type="Leader">Leader</button>
-        <button class="pill" data-type="Character">Character</button>
-        <button class="pill" data-type="Event">Event</button>
-        <button class="pill" data-type="Stage">Stage</button>
+        <button class="pill active" data-group="type" data-value="all">All</button>
+        <button class="pill" data-group="type" data-value="Leader">Leader</button>
+        <button class="pill" data-group="type" data-value="Character">Character</button>
+        <button class="pill" data-group="type" data-value="Event">Event</button>
+        <button class="pill" data-group="type" data-value="Stage">Stage</button>
+      </div>
+      <span class="filter-label" style="margin-left:12px">Rarity</span>
+      <div class="pills" role="group" aria-label="Filter by rarity">
+        <button class="pill active" data-group="rarity" data-value="all">All</button>
+        <button class="pill" data-group="rarity" data-value="L">Leader</button>
+        <button class="pill" data-group="rarity" data-value="C">C</button>
+        <button class="pill" data-group="rarity" data-value="UC">UC</button>
+        <button class="pill" data-group="rarity" data-value="R">R</button>
+        <button class="pill" data-group="rarity" data-value="SR">SR</button>
+        <button class="pill" data-group="rarity" data-value="SEC">SEC</button>
       </div>
       <select id="sortSelect" class="sort-select" aria-label="Sort cards">
         <option value="id">Sort: Card #</option>

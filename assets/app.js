@@ -36,12 +36,13 @@ const RARITY_LABEL = {
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let allCards    = [];
-let activeSet   = 'OP01';
-let activeColor = 'all';
-let activeType  = 'all';
-let activeSort  = 'id';
-let searchTerm  = '';
+let allCards      = [];
+let activeSet     = 'OP01';
+let activeColors  = new Set();  // empty = All
+let activeTypes   = new Set();  // empty = All
+let activeRarities= new Set();  // empty = All
+let activeSort    = 'id';
+let searchTerm    = '';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const cardGrid    = document.getElementById('cardGrid');
@@ -77,12 +78,14 @@ function buildSetNav() {
       activeSet = set.code;
 
       // Reset filters
-      activeColor = 'all';
-      activeType  = 'all';
-      searchTerm  = '';
+      activeColors.clear();
+      activeTypes.clear();
+      activeRarities.clear();
+      searchTerm    = '';
       searchInput.value = '';
-      document.querySelectorAll('.pill[data-filter]').forEach((p, i) => p.classList.toggle('active', i === 0));
-      document.querySelectorAll('.pill[data-type]').forEach((p, i)   => p.classList.toggle('active', i === 0));
+      document.querySelectorAll('.pill[data-group]').forEach(p => {
+        p.classList.toggle('active', p.dataset.value === 'all');
+      });
 
       if (set.available) {
         loadSet(set.code);
@@ -156,12 +159,16 @@ function getFilteredCards() {
     );
   }
 
-  if (activeColor !== 'all') {
-    cards = cards.filter(c => (c.color || []).includes(activeColor));
+  if (activeColors.size > 0) {
+    cards = cards.filter(c => (c.color || []).some(col => activeColors.has(col)));
   }
 
-  if (activeType !== 'all') {
-    cards = cards.filter(c => c.type === activeType);
+  if (activeTypes.size > 0) {
+    cards = cards.filter(c => activeTypes.has(c.type));
+  }
+
+  if (activeRarities.size > 0) {
+    cards = cards.filter(c => activeRarities.has(c.rarity));
   }
 
   if (activeSort === 'variants') {
@@ -391,20 +398,43 @@ document.addEventListener('keydown', e => {
 searchInput.addEventListener('input', e => { searchTerm = e.target.value.trim(); render(); });
 sortSelect.addEventListener('change', e => { activeSort = e.target.value; render(); });
 
-document.querySelectorAll('.pill[data-filter]').forEach(pill => {
+document.querySelectorAll('.pill[data-group]').forEach(pill => {
   pill.addEventListener('click', () => {
-    document.querySelectorAll('.pill[data-filter]').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    activeColor = pill.dataset.filter;
-    render();
-  });
-});
+    const group = pill.dataset.group;
+    const value = pill.dataset.value;
 
-document.querySelectorAll('.pill[data-type]').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.pill[data-type]').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    activeType = pill.dataset.type;
+    // Map group name to the active Set
+    const stateMap = {
+      color:  activeColors,
+      type:   activeTypes,
+      rarity: activeRarities,
+    };
+    const activeSet = stateMap[group];
+    const allPillsInGroup = document.querySelectorAll(`.pill[data-group="${group}"]`);
+    const allPill = document.querySelector(`.pill[data-group="${group}"][data-value="all"]`);
+
+    if (value === 'all') {
+      // Clicking All clears everything in this group
+      activeSet.clear();
+      allPillsInGroup.forEach(p => p.classList.remove('active'));
+      allPill.classList.add('active');
+    } else {
+      // Toggle this value
+      if (activeSet.has(value)) {
+        activeSet.delete(value);
+      } else {
+        activeSet.add(value);
+      }
+      // If nothing selected, revert to All
+      if (activeSet.size === 0) {
+        allPill.classList.add('active');
+      } else {
+        allPill.classList.remove('active');
+      }
+      // Sync active class
+      pill.classList.toggle('active', activeSet.has(value));
+    }
+
     render();
   });
 });

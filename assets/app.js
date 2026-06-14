@@ -294,7 +294,7 @@ function openCard(cardId) {
     ['Type',      card.type      || '—'],
     ['Color',     (card.color || []).join(', ') || '—'],
     ['Rarity',    RARITY_LABEL[card.rarity] || card.rarity || '—'],
-    ['Power',     card.power != null ? card.power.toLocaleString() : '—'],
+    ['Power',     card.power != null ? card.power : '—'],
     ['Attribute', card.attribute || '—'],
     card.cost != null ? ['Cost', card.cost] :
     card.life != null ? ['Life', card.life] : null,

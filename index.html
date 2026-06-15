@@ -25,14 +25,29 @@
   </header>
 
   <!-- ── Set selector panel ── -->
-  <div class="set-panel">
+  <div class="set-panel" id="setPanel">
     <div class="set-panel-inner">
-      <!-- Global All button -->
+      <!-- Global row: All Sets + Collapse toggle -->
       <div class="set-global-row">
         <button class="set-all-btn global" id="setAllBtn">All Sets</button>
+        <button class="set-collapse-btn" id="setCollapseBtn" title="Collapse set panel" aria-label="Collapse set panel">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          <span>Collapse</span>
+        </button>
       </div>
       <!-- Accordion groups — built by JS -->
       <div id="setAccordion"></div>
+    </div>
+  </div>
+
+  <!-- ── Collapsed set bar (shown when panel is collapsed) ── -->
+  <div class="set-collapsed-bar" id="setCollapsedBar" style="display:none">
+    <div class="set-collapsed-inner">
+      <span class="set-collapsed-label" id="setCollapsedLabel">OP01</span>
+      <button class="set-expand-btn" id="setExpandBtn" title="Expand set panel" aria-label="Expand set panel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        Sets
+      </button>
     </div>
   </div>
 

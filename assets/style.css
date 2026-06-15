@@ -747,3 +747,76 @@ body {
   .accordion-toggle { font-size: 11px; }
   .set-all-btn.global { font-size: 12px; }
 }
+
+/* ── Set panel collapse ── */
+.set-global-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.set-collapse-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--text-3);
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.set-collapse-btn:hover { color: var(--text-1); border-color: var(--text-3); }
+
+/* Collapsed bar — thin strip shown when panel is hidden */
+.set-collapsed-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 45;
+}
+
+.set-collapsed-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 6px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.set-collapsed-label {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.set-expand-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--text-3);
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.set-expand-btn:hover { color: var(--text-1); border-color: var(--text-3); }
+.set-expand-btn svg { transform: rotate(180deg); }
+
+@media (max-width: 640px) {
+  .set-collapsed-inner { padding: 6px 16px; }
+}

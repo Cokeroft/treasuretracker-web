@@ -79,7 +79,7 @@ const RARITY_LABEL = {
 // ── State ─────────────────────────────────────────────────────────────────────
 let allCards       = [];
 let activeSets     = new Set(['OP01']);
-let activeGroup    = 'booster'; // which tab is showing
+let collapsedGroups= new Set();           // accordion collapse state
 let activeColors   = new Set();
 let activeTypes    = new Set();
 let activeRarities = new Set();
@@ -97,71 +97,98 @@ const heroSub     = document.getElementById('heroSub');
 const searchInput = document.getElementById('searchInput');
 const sortSelect  = document.getElementById('sortSelect');
 const overlay     = document.getElementById('overlay');
-const setNav      = document.getElementById('setNav');
 
-// ── Build set nav ─────────────────────────────────────────────────────────────
+// ── Build set nav (accordion) ─────────────────────────────────────────────────
+const GROUP_LABELS = { booster: 'Booster Sets', starter: 'Starter Decks', extra: 'Extra Boosters' };
+const GROUP_ORDER  = ['booster', 'starter', 'extra'];
+
 function buildSetNav() {
-  const groupSets = ALL_SETS.filter(s => s.group === activeGroup);
+  const accordion = document.getElementById('setAccordion');
+  if (!accordion) return;
 
-  setNav.innerHTML = groupSets.map(s => `
-    <button
-      class="set-btn${activeSets.has(s.code) ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
-      data-set="${s.code}"
-      title="${s.name}${!s.available ? ' (coming soon)' : ''}"
-    >${s.code}</button>
-  `).join('');
+  accordion.innerHTML = GROUP_ORDER.map(group => {
+    const sets           = ALL_SETS.filter(s => s.group === group);
+    const groupAvailable = sets.filter(s => s.available);
+    const allGroupSel    = groupAvailable.length > 0 && groupAvailable.every(s => activeSets.has(s.code));
+    const isOpen         = !collapsedGroups.has(group);
+
+    const btns = sets.map(s => `
+      <button
+        class="set-btn${activeSets.has(s.code) ? ' active' : ''}${!s.available ? ' unavailable' : ''}"
+        data-set="${s.code}"
+        title="${s.name}${!s.available ? ' (coming soon)' : ''}"
+      >${s.code}</button>
+    `).join('');
+
+    return `<div class="accordion-group">
+      <div class="accordion-header">
+        <button class="accordion-toggle" data-group="${group}" aria-expanded="${isOpen}">
+          <svg class="accordion-chevron${isOpen ? ' open' : ''}" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          ${GROUP_LABELS[group]}
+        </button>
+        <button class="set-group-all-btn${allGroupSel ? ' active' : ''}" data-group="${group}">All</button>
+      </div>
+      <div class="accordion-body${isOpen ? ' open' : ''}">
+        <div class="set-btn-group">${btns}</div>
+      </div>
+    </div>`;
+  }).join('');
 
   syncAllBtn();
 
-  setNav.querySelectorAll('.set-btn').forEach(btn => {
+  // Accordion toggles
+  accordion.querySelectorAll('.accordion-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
-      const set = ALL_SETS.find(s => s.code === btn.dataset.set);
-      if (!set || !set.available) return;
-      toggleSet(set.code);
-      btn.classList.toggle('active', activeSets.has(set.code));
-      syncAllBtn();
+      const g = btn.dataset.group;
+      collapsedGroups.has(g) ? collapsedGroups.delete(g) : collapsedGroups.add(g);
+      buildSetNav();
+    });
+  });
+
+  // Per-group All buttons
+  accordion.querySelectorAll('.set-group-all-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const groupSets = ALL_SETS.filter(s => s.group === btn.dataset.group && s.available);
+      const allSel    = groupSets.every(s => activeSets.has(s.code));
+      allSel ? groupSets.forEach(s => activeSets.delete(s.code))
+             : groupSets.forEach(s => activeSets.add(s.code));
+      buildSetNav();
       loadActiveSets();
     });
   });
 
-  // Group tabs
-  document.querySelectorAll('.set-group-tab').forEach(tab => {
-    tab.onclick = () => {
-      activeGroup = tab.dataset.group;
-      document.querySelectorAll('.set-group-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+  // Individual set buttons
+  accordion.querySelectorAll('.set-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const set = ALL_SETS.find(s => s.code === btn.dataset.set);
+      if (!set || !set.available) return;
+      toggleSet(set.code);
       buildSetNav();
-    };
+      loadActiveSets();
+    });
   });
 
-  // All button
-  document.getElementById('setAllBtn').onclick = () => {
-    const availableInAllGroups = ALL_SETS.filter(s => s.available);
-    const allSelected = availableInAllGroups.every(s => activeSets.has(s.code));
-    if (allSelected) {
-      // Deselect all
-      activeSets.clear();
-    } else {
-      // Select all available
-      availableInAllGroups.forEach(s => activeSets.add(s.code));
-    }
-    buildSetNav(); // rebuild to sync button states
-    loadActiveSets();
-  };
+  // Global All button
+  const allBtn = document.getElementById('setAllBtn');
+  if (allBtn) {
+    allBtn.onclick = () => {
+      const available = ALL_SETS.filter(s => s.available);
+      const allSel    = available.every(s => activeSets.has(s.code));
+      allSel ? activeSets.clear() : available.forEach(s => activeSets.add(s.code));
+      buildSetNav();
+      loadActiveSets();
+    };
+  }
 }
 
 function toggleSet(code) {
-  if (activeSets.has(code)) {
-    activeSets.delete(code);
-  } else {
-    activeSets.add(code);
-  }
+  activeSets.has(code) ? activeSets.delete(code) : activeSets.add(code);
 }
 
 function syncAllBtn() {
   const btn = document.getElementById('setAllBtn');
   if (!btn) return;
-  const available = ALL_SETS.filter(s => s.available);
+  const available  = ALL_SETS.filter(s => s.available);
   const allSelected = available.length > 0 && available.every(s => activeSets.has(s.code));
   btn.classList.toggle('active', allSelected);
 }

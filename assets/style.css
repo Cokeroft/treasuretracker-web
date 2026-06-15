@@ -144,9 +144,6 @@ body {
 .filters-bar {
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
-  position: sticky;
-  top: 136px;
-  z-index: 40;
 }
 
 .filters-inner {
@@ -641,55 +638,78 @@ body {
   position: sticky;
   top: 56px;
   z-index: 45;
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-mid) transparent;
 }
 
 .set-panel-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 10px 24px;
+  padding: 10px 24px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-/* Group tabs row */
-.set-group-tabs {
-  display: flex;
   gap: 4px;
 }
 
-.set-group-tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 4px 10px 5px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-3);
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.set-group-tab:hover { color: var(--text-2); }
-.set-group-tab.active {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
-}
-
-/* All button + set buttons row */
-.set-controls {
+/* Global All button row */
+.set-global-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
 }
 
+/* ── Accordion ── */
+.accordion-group { display: flex; flex-direction: column; }
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.accordion-toggle {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+.accordion-toggle:hover { color: var(--text-1); }
+
+.accordion-chevron {
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+.accordion-chevron.open { transform: rotate(0deg); }
+.accordion-chevron:not(.open) { transform: rotate(-90deg); }
+
+.accordion-body {
+  display: none;
+  padding: 6px 0 8px 18px;
+}
+.accordion-body.open { display: block; }
+
+/* ── All buttons ── */
 .set-all-btn {
   background: var(--bg-input);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-sm);
-  padding: 4px 12px;
+  padding: 4px 14px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-2);
@@ -697,37 +717,33 @@ body {
   font-family: inherit;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
-  flex-shrink: 0;
 }
+.set-all-btn.active { background: var(--gold); border-color: var(--gold); color: #111; }
+.set-all-btn:not(.active):hover { border-color: var(--gold-dim); color: var(--text-1); }
+.set-all-btn.global { font-size: 13px; padding: 5px 16px; }
 
-.set-all-btn.active {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #111;
+.set-group-all-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  margin-left: auto;
 }
+.set-group-all-btn.active { background: var(--gold); border-color: var(--gold); color: #111; }
+.set-group-all-btn:not(.active):hover { border-color: var(--text-3); color: var(--text-2); }
 
-.set-all-btn:not(.active):hover {
-  border-color: var(--gold-dim);
-  color: var(--text-1);
-}
-
-/* Divider between All btn and set buttons */
-.set-controls::after {
-  content: '';
-  display: none;
-}
-
-.set-btn-group {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
+.set-btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
 
 /* Mobile adjustments */
 @media (max-width: 640px) {
-  .set-panel { top: 52px; }
-  .set-panel-inner { padding: 8px 16px; gap: 6px; }
-  .set-group-tab { font-size: 11px; padding: 3px 8px 4px; }
-  .set-btn-group { gap: 4px; }
-  .set-all-btn { font-size: 11px; }
+  .set-panel { top: 52px; max-height: 50vh; }
+  .set-panel-inner { padding: 8px 16px 10px; }
+  .accordion-toggle { font-size: 11px; }
+  .set-all-btn.global { font-size: 12px; }
 }

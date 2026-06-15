@@ -27,17 +27,12 @@
   <!-- ── Set selector panel ── -->
   <div class="set-panel">
     <div class="set-panel-inner">
-      <!-- Group tabs -->
-      <div class="set-group-tabs" id="setGroupTabs">
-        <button class="set-group-tab active" data-group="booster">Booster Sets</button>
-        <button class="set-group-tab" data-group="starter">Starter Decks</button>
-        <button class="set-group-tab" data-group="extra">Extra Boosters</button>
+      <!-- Global All button -->
+      <div class="set-global-row">
+        <button class="set-all-btn global" id="setAllBtn">All Sets</button>
       </div>
-      <!-- All toggle + set buttons -->
-      <div class="set-controls">
-        <button class="set-all-btn" id="setAllBtn">All</button>
-        <div class="set-btn-group" id="setNav" aria-label="Select sets"></div>
-      </div>
+      <!-- Accordion groups — built by JS -->
+      <div id="setAccordion"></div>
     </div>
   </div>
 

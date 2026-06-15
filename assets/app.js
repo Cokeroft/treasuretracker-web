@@ -81,6 +81,7 @@ let allCards       = [];
 let activeSets     = new Set(['OP01']);
 let collapsedGroups= new Set();           // accordion collapse state
 let activeColors   = new Set();
+let colorMode      = 'any'; // 'any' = OR, 'all' = AND
 let activeTypes    = new Set();
 let activeRarities = new Set();
 let activeSort     = 'id';
@@ -274,7 +275,17 @@ function getFilteredCards() {
   }
 
   if (activeColors.size > 0) {
-    cards = cards.filter(c => (c.color || []).some(col => activeColors.has(col)));
+    if (colorMode === 'all') {
+      // AND: card must have ALL selected colors
+      cards = cards.filter(c =>
+        [...activeColors].every(col => (c.color || []).includes(col))
+      );
+    } else {
+      // OR: card must have ANY of the selected colors
+      cards = cards.filter(c =>
+        (c.color || []).some(col => activeColors.has(col))
+      );
+    }
   }
 
   if (activeTypes.size > 0) {
@@ -537,6 +548,16 @@ document.addEventListener('keydown', e => {
 
 searchInput.addEventListener('input', e => { searchTerm = e.target.value.trim(); render(); });
 sortSelect.addEventListener('change', e => { activeSort = e.target.value; render(); });
+
+const colorModeBtn = document.getElementById('colorModeBtn');
+if (colorModeBtn) {
+  colorModeBtn.addEventListener('click', () => {
+    colorMode = colorMode === 'any' ? 'all' : 'any';
+    colorModeBtn.textContent = colorMode === 'any' ? 'Any' : 'All';
+    colorModeBtn.classList.toggle('active', colorMode === 'all');
+    render();
+  });
+}
 
 document.querySelectorAll('.pill[data-group]').forEach(pill => {
   pill.addEventListener('click', () => {

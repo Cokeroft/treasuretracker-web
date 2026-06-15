@@ -347,23 +347,20 @@ function getMainImageUrl(card) {
   );
   if (!variants.length) return null;
 
-  // Exclude Revision Pack from hero image selection — TCGPlayer often has
-  // placeholder images for them. Fall back to Revision Pack only if nothing else exists.
-  const nonRevision = variants.filter(v => v.label !== 'Revision Pack');
-  const revision    = variants.find(v => v.label === 'Revision Pack');
-  const pool        = nonRevision.length > 0 ? nonRevision : variants;
+  // If a Revision Pack variant exists, always prefer it — it has the cleanest image
+  const revision = variants.find(v => v.label === 'Revision Pack');
+  if (revision) return revision.tcgplayer_image_url;
 
-  // Prefer Normal/Parallel from the base set
+  // Otherwise prefer base set Normal/Parallel
   for (const { label, methods } of LABEL_PRIORITY) {
-    const match = pool.find(v =>
+    const match = variants.find(v =>
       (v.label || '').toLowerCase().startsWith(label) &&
       methods.includes(v.acquisition?.method)
     );
     if (match) return match.tcgplayer_image_url;
   }
 
-  // Fall back to first non-revision, or revision as last resort
-  return pool[0]?.tcgplayer_image_url || revision?.tcgplayer_image_url || null;
+  return variants[0]?.tcgplayer_image_url || null;
 }
 
 // Attaches a smart fallback chain to an img element.

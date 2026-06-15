@@ -339,7 +339,6 @@ const LABEL_PRIORITY = [
   { label: 'normal', methods: ['booster_pack', 'starter_deck'] },
   { label: 'parallel rare', methods: ['booster_pack', 'starter_deck'] },
   { label: 'parallel', methods: ['booster_pack', 'starter_deck'] },
-  { label: 'revision pack', methods: ['retail_product'] },
 ];
 
 function getMainImageUrl(card) {
@@ -348,20 +347,23 @@ function getMainImageUrl(card) {
   );
   if (!variants.length) return null;
 
-  // If a Revision Pack variant exists, always prefer it — it has the cleanest image
-  const revision = variants.find(v => v.label === 'Revision Pack');
-  if (revision) return revision.tcgplayer_image_url;
+  // Exclude Revision Pack from hero image selection — TCGPlayer often has
+  // placeholder images for them. Fall back to Revision Pack only if nothing else exists.
+  const nonRevision = variants.filter(v => v.label !== 'Revision Pack');
+  const revision    = variants.find(v => v.label === 'Revision Pack');
+  const pool        = nonRevision.length > 0 ? nonRevision : variants;
 
-  // Otherwise prefer base set Normal/Parallel
+  // Prefer Normal/Parallel from the base set
   for (const { label, methods } of LABEL_PRIORITY) {
-    const match = variants.find(v =>
+    const match = pool.find(v =>
       (v.label || '').toLowerCase().startsWith(label) &&
       methods.includes(v.acquisition?.method)
     );
     if (match) return match.tcgplayer_image_url;
   }
 
-  return variants[0].tcgplayer_image_url;
+  // Fall back to first non-revision, or revision as last resort
+  return pool[0]?.tcgplayer_image_url || revision?.tcgplayer_image_url || null;
 }
 
 // Attaches a smart fallback chain to an img element.

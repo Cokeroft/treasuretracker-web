@@ -24,7 +24,7 @@ const ALL_SETS = [
   // ── Starter Decks ──
   { code: 'ST01',  name: 'Straw Hat Crew',                  group: 'starter', available: true  },
   { code: 'ST02',  name: 'Worst Generation',                group: 'starter', available: true  },
-  { code: 'ST03',  name: 'The Seven Warlords of the Sea',   group: 'starter', available: false },
+  { code: 'ST03',  name: 'The Seven Warlords of the Sea',   group: 'starter', available: true  },
   { code: 'ST04',  name: 'Animal Kingdom Pirates',          group: 'starter', available: false },
   { code: 'ST05',  name: 'ONE PIECE FILM RED',              group: 'starter', available: false },
   { code: 'ST06',  name: 'Absolute Justice',                group: 'starter', available: false },

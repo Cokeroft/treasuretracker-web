@@ -54,8 +54,9 @@ const ALL_SETS = [
   { code: 'ST30',  name: 'Starter Deck 30',                 group: 'starter', available: false },
   // ── Extra Boosters ──
   { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: true  },
-  { code: 'EB02',  name: 'Memorial Collection 2',       group: 'extra',   available: true  },
-  { code: 'EB03',  name: 'Extra Booster 3',             group: 'extra',   available: false },
+  { code: 'EB02',  name: 'Anime 25th Collection',       group: 'extra',   available: true  },
+  { code: 'EB03',  name: 'ONE PIECE Heroines Edition',  group: 'extra',   available: true  },
+  { code: 'EB04',  name: 'Egghead Crisis',             group: 'extra',   available: false },
 ];
 
 const COLOR_BADGE = {

@@ -56,7 +56,7 @@ const ALL_SETS = [
   { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: true  },
   { code: 'EB02',  name: 'Anime 25th Collection',       group: 'extra',   available: true  },
   { code: 'EB03',  name: 'ONE PIECE Heroines Edition',  group: 'extra',   available: true  },
-  { code: 'EB04',  name: 'Egghead Crisis',             group: 'extra',   available: false },
+  { code: 'EB04',  name: 'Egghead Crisis',             group: 'extra',   available: true  },
 ];
 
 const COLOR_BADGE = {

@@ -975,3 +975,15 @@ body {
 @media (max-width: 640px) {
   .affil-search-wrap { width: 100%; }
 }
+
+/* ── Affiliation chip "not in current view" warning ── */
+.affil-chip.not-in-view {
+  background: var(--bg-input);
+  border-color: var(--border-mid);
+  color: var(--text-2);
+}
+.affil-chip.not-in-view button { color: var(--text-2); }
+.affil-chip-warn {
+  color: #f87171;
+  font-weight: 700;
+}

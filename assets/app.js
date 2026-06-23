@@ -79,6 +79,8 @@ const RARITY_LABEL = {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let allCards       = [];
+let allCardsCache  = null;   // every card across every available set, for affiliation search
+let allCardsCacheLoading = false;
 let activeSets     = new Set();
 let collapsedGroups= new Set();           // accordion collapse state
 let activeColors   = new Set();
@@ -206,6 +208,7 @@ async function loadActiveSets() {
   if (available.length === 0) {
     allCards = [];
     updateHero();
+    renderAffilChips();
     showState('coming-soon');
     return;
   }
@@ -225,6 +228,7 @@ async function loadActiveSets() {
     allCards = results.flat();
     updateHero();
     updateCollapsedLabel();
+    renderAffilChips();
     showState('grid');
     render();
   } catch (err) {
@@ -610,11 +614,38 @@ if (colorModeBtn) {
 }
 
 // ── Affiliation autocomplete ─────────────────────────────────────────────────
+// Fetches every available set once, caches the result, so the affiliation/subtype
+// search always has the full catalog regardless of which sets are currently browsed.
+async function loadAllCardsCache() {
+  if (allCardsCache || allCardsCacheLoading) return allCardsCache;
+  allCardsCacheLoading = true;
+
+  const available = ALL_SETS.filter(s => s.available);
+  try {
+    const results = await Promise.all(
+      available.map(s =>
+        fetch(`${API_BASE}/sets/${s.code}/cards`)
+          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+          .then(d => d.cards || [])
+          .catch(() => [])  // don't let one failed set break the whole cache
+      )
+    );
+    allCardsCache = results.flat();
+  } catch (err) {
+    console.error('Failed to build full card cache for subtype search:', err);
+    allCardsCache = [...allCards]; // fall back to whatever's currently loaded
+  } finally {
+    allCardsCacheLoading = false;
+  }
+  return allCardsCache;
+}
+
 function getAffiliationCounts() {
   // Build a map of affiliation name -> count of cards with that affiliation,
-  // scoped to whatever sets are currently loaded (allCards)
+  // scoped to the FULL catalog (all available sets), not just what's browsed
+  const source = allCardsCache || allCards;
   const counts = {};
-  for (const c of allCards) {
+  for (const c of source) {
     for (const aff of (c.affiliations || [])) {
       counts[aff] = (counts[aff] || 0) + 1;
     }
@@ -625,14 +656,25 @@ function getAffiliationCounts() {
 function renderAffilChips() {
   const chipsEl = document.getElementById('affilChips');
   if (!chipsEl) return;
-  chipsEl.innerHTML = [...activeAffiliations].map(aff => `
-    <span class="affil-chip" data-affil="${escHtml(aff)}">
-      ${escHtml(aff)}
-      <button type="button" aria-label="Remove ${escHtml(aff)}">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </span>
-  `).join('');
+
+  // Flag chips that don't exist in any currently-loaded (browsed) set,
+  // so the person knows why results might look empty
+  const loadedAffils = new Set();
+  for (const c of allCards) {
+    for (const aff of (c.affiliations || [])) loadedAffils.add(aff);
+  }
+
+  chipsEl.innerHTML = [...activeAffiliations].map(aff => {
+    const notInView = allCards.length > 0 && !loadedAffils.has(aff);
+    return `
+      <span class="affil-chip${notInView ? ' not-in-view' : ''}" data-affil="${escHtml(aff)}" ${notInView ? `title="Not found in your currently selected sets"` : ''}>
+        ${escHtml(aff)}${notInView ? ' <span class="affil-chip-warn">!</span>' : ''}
+        <button type="button" aria-label="Remove ${escHtml(aff)}">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </span>
+    `;
+  }).join('');
 
   chipsEl.querySelectorAll('.affil-chip button').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -650,6 +692,16 @@ function showAffilDropdown(query) {
 
   if (!query) { dropdown.style.display = 'none'; return; }
 
+  if (!allCardsCache) {
+    dropdown.innerHTML = `<div class="affil-no-results">Loading full catalog...</div>`;
+    dropdown.style.display = 'block';
+    loadAllCardsCache().then(() => {
+      // Re-run the search once the cache is ready, in case input is still focused
+      if (affilInput && affilInput.value.trim() === query) showAffilDropdown(query);
+    });
+    return;
+  }
+
   const counts = getAffiliationCounts();
   const q = query.toLowerCase();
   const matches = Object.entries(counts)
@@ -658,7 +710,7 @@ function showAffilDropdown(query) {
     .slice(0, 12);
 
   if (matches.length === 0) {
-    dropdown.innerHTML = `<div class="affil-no-results">No matching affiliations in selected sets</div>`;
+    dropdown.innerHTML = `<div class="affil-no-results">No matching subtypes found</div>`;
     dropdown.style.display = 'block';
     return;
   }
@@ -801,3 +853,4 @@ function initCollapseToggle() {
 buildSetNav();
 initCollapseToggle();
 loadActiveSets();
+loadAllCardsCache(); // warm the subtype/affiliation cache in the background

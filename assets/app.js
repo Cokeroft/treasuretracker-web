@@ -18,7 +18,7 @@ const ALL_SETS = [
   { code: 'OP13',  name: 'Fishman Island',              group: 'booster', available: false },
   { code: 'OP14',  name: 'The Azure Seas Seven',        group: 'booster', available: false },
   { code: 'OP15',  name: 'Carrying On His Will',        group: 'booster', available: false },
-  { code: 'OP16',  name: 'Emperors in the New World',   group: 'booster', available: false },
+  { code: 'OP16',  name: 'The Time of Battle',          group: 'booster', available: true  },
   { code: 'PRB01', name: 'Premium Booster The Best',    group: 'booster', available: false },
   { code: 'PRB02', name: 'Premium Booster The Best Vol.2', group: 'booster', available: false },
   // ── Starter Decks ──

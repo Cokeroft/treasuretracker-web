@@ -79,7 +79,7 @@ const RARITY_LABEL = {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let allCards       = [];
-let activeSets     = new Set(['OP01']);
+let activeSets     = new Set();
 let collapsedGroups= new Set();           // accordion collapse state
 let activeColors   = new Set();
 let colorMode      = 'any'; // 'any' = OR, 'all' = AND

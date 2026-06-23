@@ -16,7 +16,7 @@ const ALL_SETS = [
   { code: 'OP11',  name: 'Egghead',                     group: 'booster', available: false },
   { code: 'OP12',  name: 'Supernovas',                  group: 'booster', available: false },
   { code: 'OP13',  name: 'Fishman Island',              group: 'booster', available: false },
-  { code: 'OP14',  name: 'The Azure Seas Seven',        group: 'booster', available: false },
+  { code: 'OP14',  name: 'The Azure Seas Seven',        group: 'booster', available: true  },
   { code: 'OP15',  name: "Adventure on Kami's Island",  group: 'booster', available: true  },
   { code: 'OP16',  name: 'The Time of Battle',          group: 'booster', available: true  },
   { code: 'PRB01', name: 'Premium Booster The Best',    group: 'booster', available: false },

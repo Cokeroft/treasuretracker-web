@@ -882,3 +882,96 @@ body {
   }
   .modal-nav-btn svg { width: 18px; height: 18px; }
 }
+
+/* ── Affiliation filter row ── */
+.affiliation-row {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.affil-search-wrap {
+  position: relative;
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.affil-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-1);
+  font-family: inherit;
+  outline: none;
+}
+.affil-input:focus { border-color: var(--gold-dim); }
+.affil-input::placeholder { color: var(--text-3); }
+
+.affil-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  z-index: 60;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.affil-option {
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text-1);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.affil-option:hover, .affil-option.highlighted {
+  background: var(--bg-input);
+}
+.affil-option .affil-count {
+  font-size: 10px;
+  color: var(--text-3);
+}
+.affil-no-results {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.affil-chip {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 20px;
+  padding: 3px 6px 3px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #111;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.affil-chip button {
+  background: none;
+  border: none;
+  color: #111;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+}
+.affil-chip button:hover { opacity: 1; }
+
+@media (max-width: 640px) {
+  .affil-search-wrap { width: 100%; }
+}

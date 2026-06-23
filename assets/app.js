@@ -85,6 +85,8 @@ let activeColors   = new Set();
 let colorMode      = 'any'; // 'any' = OR, 'all' = AND
 let activeTypes    = new Set();
 let activeRarities = new Set();
+let activeAffiliations = new Set();
+let affiliationMode = 'any'; // 'any' = OR, 'all' = AND
 let activeSort     = 'id';
 let searchTerm     = '';
 let currentCardList  = [];   // cards in current filter/sort order, for modal nav
@@ -297,6 +299,20 @@ function getFilteredCards() {
 
   if (activeRarities.size > 0) {
     cards = cards.filter(c => activeRarities.has(c.rarity));
+  }
+
+  if (activeAffiliations.size > 0) {
+    if (affiliationMode === 'all') {
+      // AND: card must have ALL selected affiliations
+      cards = cards.filter(c =>
+        [...activeAffiliations].every(aff => (c.affiliations || []).includes(aff))
+      );
+    } else {
+      // OR: card must have ANY of the selected affiliations
+      cards = cards.filter(c =>
+        (c.affiliations || []).some(aff => activeAffiliations.has(aff))
+      );
+    }
   }
 
   if (activeSort === 'variants') {
@@ -589,6 +605,101 @@ if (colorModeBtn) {
     colorMode = colorMode === 'any' ? 'all' : 'any';
     colorModeBtn.textContent = colorMode === 'any' ? 'Any' : 'All';
     colorModeBtn.classList.toggle('active', colorMode === 'all');
+    render();
+  });
+}
+
+// ── Affiliation autocomplete ─────────────────────────────────────────────────
+function getAffiliationCounts() {
+  // Build a map of affiliation name -> count of cards with that affiliation,
+  // scoped to whatever sets are currently loaded (allCards)
+  const counts = {};
+  for (const c of allCards) {
+    for (const aff of (c.affiliations || [])) {
+      counts[aff] = (counts[aff] || 0) + 1;
+    }
+  }
+  return counts;
+}
+
+function renderAffilChips() {
+  const chipsEl = document.getElementById('affilChips');
+  if (!chipsEl) return;
+  chipsEl.innerHTML = [...activeAffiliations].map(aff => `
+    <span class="affil-chip" data-affil="${escHtml(aff)}">
+      ${escHtml(aff)}
+      <button type="button" aria-label="Remove ${escHtml(aff)}">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </span>
+  `).join('');
+
+  chipsEl.querySelectorAll('.affil-chip button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const aff = btn.closest('.affil-chip').dataset.affil;
+      activeAffiliations.delete(aff);
+      renderAffilChips();
+      render();
+    });
+  });
+}
+
+function showAffilDropdown(query) {
+  const dropdown = document.getElementById('affilDropdown');
+  if (!dropdown) return;
+
+  if (!query) { dropdown.style.display = 'none'; return; }
+
+  const counts = getAffiliationCounts();
+  const q = query.toLowerCase();
+  const matches = Object.entries(counts)
+    .filter(([aff]) => aff.toLowerCase().includes(q) && !activeAffiliations.has(aff))
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12);
+
+  if (matches.length === 0) {
+    dropdown.innerHTML = `<div class="affil-no-results">No matching affiliations in selected sets</div>`;
+    dropdown.style.display = 'block';
+    return;
+  }
+
+  dropdown.innerHTML = matches.map(([aff, count]) => `
+    <div class="affil-option" data-affil="${escHtml(aff)}">
+      <span>${escHtml(aff)}</span>
+      <span class="affil-count">${count}</span>
+    </div>
+  `).join('');
+  dropdown.style.display = 'block';
+
+  dropdown.querySelectorAll('.affil-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      activeAffiliations.add(opt.dataset.affil);
+      affilInput.value = '';
+      dropdown.style.display = 'none';
+      renderAffilChips();
+      render();
+    });
+  });
+}
+
+const affilInput = document.getElementById('affilInput');
+if (affilInput) {
+  affilInput.addEventListener('input', e => showAffilDropdown(e.target.value.trim()));
+  affilInput.addEventListener('focus', e => { if (e.target.value.trim()) showAffilDropdown(e.target.value.trim()); });
+  document.addEventListener('click', e => {
+    const dropdown = document.getElementById('affilDropdown');
+    if (dropdown && !affilInput.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+}
+
+const affilModeBtn = document.getElementById('affilModeBtn');
+if (affilModeBtn) {
+  affilModeBtn.addEventListener('click', () => {
+    affiliationMode = affiliationMode === 'any' ? 'all' : 'any';
+    affilModeBtn.textContent = affiliationMode === 'any' ? 'Any' : 'All';
+    affilModeBtn.classList.toggle('active', affiliationMode === 'all');
     render();
   });
 }

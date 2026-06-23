@@ -95,6 +95,17 @@
         <option value="name">Name A–Z</option>
       </select>
     </div>
+
+    <!-- ── Affiliation/type filter row ── -->
+    <div class="filters-inner affiliation-row">
+      <span class="filter-label">Affiliation</span>
+      <button class="filter-mode-btn" id="affilModeBtn" title="Switch between Any (OR) and All (AND) affiliation matching">Any</button>
+      <div class="affil-search-wrap">
+        <input type="text" id="affilInput" class="affil-input" placeholder="Type to search e.g. Straw Hat Crew, FILM..." autocomplete="off">
+        <div id="affilDropdown" class="affil-dropdown" style="display:none"></div>
+      </div>
+      <div class="pills" id="affilChips" role="group" aria-label="Selected affiliations"></div>
+    </div>
   </div>
 
   <!-- ── Main content ── -->

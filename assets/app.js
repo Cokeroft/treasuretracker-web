@@ -87,6 +87,8 @@ let activeTypes    = new Set();
 let activeRarities = new Set();
 let activeSort     = 'id';
 let searchTerm     = '';
+let currentCardList  = [];   // cards in current filter/sort order, for modal nav
+let currentCardIndex = -1;   // index of currently open card within currentCardList
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const cardGrid    = document.getElementById('cardGrid');
@@ -454,6 +456,10 @@ function openCard(cardId) {
   const card = allCards.find(c => c.id === cardId);
   if (!card) return;
 
+  // Track position within the currently filtered/sorted list for prev/next nav
+  currentCardList = getFilteredCards();
+  currentCardIndex = currentCardList.findIndex(c => c.id === cardId);
+
   document.getElementById('mTitle').textContent = card.name || card.id;
   document.getElementById('mSub').textContent = `${card.id} · ${card.type || ''} · ${(card.color || []).join('/')}`;
 
@@ -530,21 +536,48 @@ function openCard(cardId) {
     attachSmartFallback(img, [img.src], `<div class="variant-img-ph">${cardIconSvg()}</div>`);
   });
 
+  updateModalNavButtons();
+
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   document.getElementById('closeBtn').focus();
 }
 
+function updateModalNavButtons() {
+  const prevBtn = document.getElementById('modalPrevBtn');
+  const nextBtn = document.getElementById('modalNextBtn');
+  if (!prevBtn || !nextBtn) return;
+  prevBtn.classList.toggle('hidden', currentCardIndex <= 0);
+  nextBtn.classList.toggle('hidden', currentCardIndex >= currentCardList.length - 1 || currentCardIndex === -1);
+}
+
+function navigateModal(direction) {
+  if (currentCardIndex === -1) return;
+  const newIndex = currentCardIndex + direction;
+  if (newIndex < 0 || newIndex >= currentCardList.length) return;
+  openCard(currentCardList[newIndex].id);
+}
+
 function closeModal() {
   overlay.style.display = 'none';
   document.body.style.overflow = '';
+  currentCardIndex = -1;
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────────
 document.getElementById('closeBtn').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+const modalPrevBtn = document.getElementById('modalPrevBtn');
+const modalNextBtn = document.getElementById('modalNextBtn');
+if (modalPrevBtn) modalPrevBtn.addEventListener('click', () => navigateModal(-1));
+if (modalNextBtn) modalNextBtn.addEventListener('click', () => navigateModal(1));
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && overlay.style.display === 'flex') closeModal();
+  if (overlay.style.display !== 'flex') return;
+  if (e.key === 'Escape') { closeModal(); return; }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); navigateModal(-1); return; }
+  if (e.key === 'ArrowRight') { e.preventDefault(); navigateModal(1); return; }
 });
 
 searchInput.addEventListener('input', e => { searchTerm = e.target.value.trim(); render(); });

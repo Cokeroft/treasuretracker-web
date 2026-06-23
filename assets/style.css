@@ -842,3 +842,43 @@ body {
   border-color: var(--gold);
   color: #111;
 }
+
+/* ── Modal navigation chevrons ── */
+.modal-nav-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0 16px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.modal-nav-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+  transform: scale(1.05);
+}
+
+.modal-nav-btn:active { transform: scale(0.95); }
+
+.modal-nav-btn.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .modal-nav-btn {
+    width: 36px;
+    height: 36px;
+    margin: 0 6px;
+  }
+  .modal-nav-btn svg { width: 18px; height: 18px; }
+}

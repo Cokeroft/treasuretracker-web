@@ -120,6 +120,9 @@
 
   <!-- ── Detail Modal ── -->
   <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Card detail" style="display:none">
+    <button class="modal-nav-btn prev" id="modalPrevBtn" aria-label="Previous card" title="Previous card">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <div class="modal">
       <div class="modal-header">
         <div>
@@ -148,6 +151,9 @@
         <div class="variants-grid" id="vGrid"></div>
       </div>
     </div>
+    <button class="modal-nav-btn next" id="modalNextBtn" aria-label="Next card" title="Next card">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
   </div>
 
   <script src="assets/app.js"></script>

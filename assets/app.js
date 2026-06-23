@@ -509,7 +509,7 @@ function openCard(cardId) {
   ).join('');
 
   if (card.affiliations && card.affiliations.length) {
-    attrsHtml += `<div style="grid-column:1/-1"><div class="attr-label">Affiliations</div><div class="attr-val" style="font-size:13px">${escHtml(card.affiliations.join(', '))}</div></div>`;
+    attrsHtml += `<div style="grid-column:1/-1"><div class="attr-label">Subtype</div><div class="attr-val" style="font-size:13px">${escHtml(card.affiliations.join(', '))}</div></div>`;
   }
   document.getElementById('mAttrs').innerHTML = attrsHtml;
 

@@ -211,7 +211,7 @@ function renderPool() {
   poolGrid.style.display = 'grid';
 
   poolGrid.innerHTML = cards.map(card => {
-    const img = getMainImageUrl(card);
+    const img = getDisplayImageUrl(card);
     const inDeck = deck.get(card.id);
     const count = inDeck ? inDeck.count : 0;
     const maxed = count >= MAX_COPIES;
@@ -280,7 +280,7 @@ function addToDeck(cardId) {
   const existing = deck.get(cardId);
   const count = existing ? existing.count : 0;
   if (count >= MAX_COPIES) return;
-  deck.set(cardId, { card, count: count + 1 });
+  deck.set(cardId, { card, count: count + 1, preferredVariantId: existing?.preferredVariantId || null });
   updateDeckProgress();
   if (currentView === 'browse') renderPool();
   if (currentView === 'deck') renderDeckList();
@@ -293,12 +293,33 @@ function removeFromDeck(cardId, removeAll = false) {
   if (removeAll || existing.count <= 1) {
     deck.delete(cardId);
   } else {
-    deck.set(cardId, { card: existing.card, count: existing.count - 1 });
+    deck.set(cardId, { card: existing.card, count: existing.count - 1, preferredVariantId: existing.preferredVariantId });
   }
   updateDeckProgress();
   if (currentView === 'browse') renderPool();
   if (currentView === 'deck') renderDeckList();
   updateModalDeckActions();
+}
+
+function setPreferredVariant(cardId, variantId) {
+  const existing = deck.get(cardId);
+  if (!existing) return;
+  // Toggle off if clicking the already-selected variant
+  const newPref = existing.preferredVariantId === variantId ? null : variantId;
+  deck.set(cardId, { ...existing, preferredVariantId: newPref });
+  if (currentView === 'browse') renderPool();
+  if (currentView === 'deck') renderDeckList();
+}
+
+// Returns the image to display for a card, respecting any preferred variant
+// chosen in the deck. Falls back to the default hero image otherwise.
+function getDisplayImageUrl(card) {
+  const entry = deck.get(card.id);
+  if (entry?.preferredVariantId) {
+    const v = (card.variants || []).find(v => v.variant_id === entry.preferredVariantId);
+    if (v?.tcgplayer_image_url) return v.tcgplayer_image_url;
+  }
+  return getMainImageUrl(card);
 }
 
 function updateDeckProgress() {
@@ -346,7 +367,7 @@ function renderDeckList() {
   deckList.style.display = 'grid';
 
   deckList.innerHTML = entries.map(({ card, count }) => {
-    const img = getMainImageUrl(card);
+    const img = getDisplayImageUrl(card);
     const imgHtml = img
       ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${escHtml(card.name || card.id)}" loading="lazy" data-fallback="1"></div>`
       : `<div class="card-img-wrap"><div class="card-img-ph">${cardIconSvg()}</div></div>`;
@@ -418,7 +439,7 @@ function renderSidebar() {
   sidebarList.style.display = 'flex';
 
   sidebarList.innerHTML = entries.map(({ card, count }) => {
-    const img = getMainImageUrl(card);
+    const img = getDisplayImageUrl(card);
     const thumb = img
       ? `<img class="sidebar-row-thumb" src="${img}" alt="${escHtml(card.name || card.id)}" data-id="${card.id}" loading="lazy">`
       : `<div class="sidebar-row-thumb-ph" data-id="${card.id}">${cardIconSvg()}</div>`;
@@ -579,13 +600,32 @@ function openCard(cardId) {
 
   const variants = card.variants || [];
   document.getElementById('vHeading').textContent = `${variants.length} variant${variants.length !== 1 ? 's' : ''}`;
+
+  const deckEntry = deck.get(card.id);
+  const inDeck = !!deckEntry && card.type !== 'Leader';
+
   document.getElementById('vGrid').innerHTML = variants.map(v => {
     const method = v.acquisition && v.acquisition.method ? v.acquisition.method.replace(/_/g, ' ') : '';
     const link = v.tcgplayer_url
       ? `<a class="tcg-link" href="${v.tcgplayer_url}" target="_blank" rel="noopener">TCGPlayer <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
       : '';
-    return `<div class="variant-card">
+
+    const isSelected = inDeck && (
+      deckEntry.preferredVariantId === v.variant_id ||
+      (!deckEntry.preferredVariantId && v.tcgplayer_image_url === getMainImageUrl(card))
+    );
+
+    const selectBtn = inDeck && v.tcgplayer_image_url
+      ? `<button class="variant-select-btn${isSelected ? ' selected' : ''}" data-variant-id="${v.variant_id}" data-card-id="${card.id}" title="${isSelected ? 'Currently displayed in your deck' : 'Use this art for your deck'}">
+          ${isSelected
+            ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+            : ''}
+        </button>`
+      : '';
+
+    return `<div class="variant-card${isSelected ? ' variant-card-selected' : ''}">
       <div class="variant-img-wrap">
+        ${selectBtn}
         ${v.tcgplayer_image_url ? `<img class="variant-img" src="${v.tcgplayer_image_url}" alt="${escHtml(v.label)}" loading="lazy" data-fallback="1">` : `<div class="variant-img-ph">${cardIconSvg()}</div>`}
       </div>
       <div class="variant-info">
@@ -596,6 +636,14 @@ function openCard(cardId) {
       </div>
     </div>`;
   }).join('');
+
+  document.querySelectorAll('.variant-select-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      setPreferredVariant(btn.dataset.cardId, btn.dataset.variantId);
+      openCard(btn.dataset.cardId); // re-render modal to reflect new selection
+    });
+  });
 
   document.querySelectorAll('#vGrid img[data-fallback]').forEach(img => {
     attachSmartFallback(img, [img.src], `<div class="variant-img-ph">${cardIconSvg()}</div>`);

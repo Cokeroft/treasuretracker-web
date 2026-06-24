@@ -645,3 +645,38 @@
   opacity: 0.4;
   pointer-events: none;
 }
+
+/* ── Variant art selector (deck builder modal) ── */
+.variant-img-wrap { position: relative; }
+
+.variant-card-selected {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.variant-select-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(13,17,23,0.75);
+  border: 1.5px solid rgba(255,255,255,0.4);
+  color: #fff;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.variant-select-btn:hover {
+  border-color: var(--gold);
+  transform: scale(1.1);
+}
+.variant-select-btn.selected {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+}

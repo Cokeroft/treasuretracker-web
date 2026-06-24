@@ -783,31 +783,31 @@ document.querySelectorAll('.db-view-btn').forEach(btn => {
   btn.addEventListener('click', () => setView(btn.dataset.view));
 });
 
-document.getElementById('changeLeaderBtn').addEventListener('click', changeLeader);
-document.getElementById('clearDeckBtn').addEventListener('click', clearDeck);
+document.getElementById('changeLeaderBtn')?.addEventListener('click', changeLeader);
+document.getElementById('clearDeckBtn')?.addEventListener('click', clearDeck);
 
-document.getElementById('exportBtn').addEventListener('click', openExportModal);
-document.getElementById('exportCloseBtn').addEventListener('click', closeExportModal);
-document.getElementById('exportOverlay').addEventListener('click', e => {
+document.getElementById('exportBtn')?.addEventListener('click', openExportModal);
+document.getElementById('exportCloseBtn')?.addEventListener('click', closeExportModal);
+document.getElementById('exportOverlay')?.addEventListener('click', e => {
   if (e.target.id === 'exportOverlay') closeExportModal();
 });
-document.getElementById('copySimBtn').addEventListener('click', e => {
+document.getElementById('copySimBtn')?.addEventListener('click', e => {
   copyToClipboard(document.getElementById('simExportText').value, e.target);
 });
-document.getElementById('copyTcgBtn').addEventListener('click', e => {
+document.getElementById('copyTcgBtn')?.addEventListener('click', e => {
   copyToClipboard(document.getElementById('tcgExportText').value, e.target);
 });
 
 document.getElementById('importBtnLeaderScreen')?.addEventListener('click', openImportModal);
 document.getElementById('importBtnBuilder')?.addEventListener('click', openImportModal);
-document.getElementById('importCloseBtn').addEventListener('click', closeImportModal);
-document.getElementById('importOverlay').addEventListener('click', e => {
+document.getElementById('importCloseBtn')?.addEventListener('click', closeImportModal);
+document.getElementById('importOverlay')?.addEventListener('click', e => {
   if (e.target.id === 'importOverlay') closeImportModal();
 });
-document.getElementById('importConfirmBtn').addEventListener('click', handleImportConfirm);
+document.getElementById('importConfirmBtn')?.addEventListener('click', handleImportConfirm);
 
-document.getElementById('closeBtn').addEventListener('click', closeModal);
-overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.getElementById('closeBtn')?.addEventListener('click', closeModal);
+overlay?.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 
 const modalPrevBtn = document.getElementById('modalPrevBtn');
 const modalNextBtn = document.getElementById('modalNextBtn');

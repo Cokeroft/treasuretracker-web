@@ -780,17 +780,34 @@ function buildTcgExport() {
       missing.push(card.name || card.id);
     }
   }
-  return { text: lines.join('\n'), missing };
+  return { text: lines.join('\n'), missing, entries: lines };
+}
+
+function buildTcgUrl(entries) {
+  if (!entries.length) return null;
+  const cParam = entries.join('||');
+  return `https://www.tcgplayer.com/massentry?productline=${encodeURIComponent('One Piece Card Game')}&c=${encodeURIComponent(cParam)}`;
 }
 
 function openExportModal() {
   document.getElementById('simExportText').value = buildSimExport();
-  const { text, missing } = buildTcgExport();
+  const { text, missing, entries } = buildTcgExport();
   document.getElementById('tcgExportText').value = text;
   const noteEl = document.getElementById('tcgExportNote');
   noteEl.textContent = missing.length
     ? `Note: ${missing.length} card${missing.length !== 1 ? 's' : ''} couldn't be matched to a TCGPlayer listing and ${missing.length !== 1 ? 'were' : 'was'} skipped: ${missing.join(', ')}`
     : '';
+
+  const tcgLinkBtn = document.getElementById('tcgGoToBtn');
+  const url = buildTcgUrl(entries);
+  if (url) {
+    tcgLinkBtn.href = url;
+    tcgLinkBtn.classList.remove('disabled');
+  } else {
+    tcgLinkBtn.href = '#';
+    tcgLinkBtn.classList.add('disabled');
+  }
+
   document.getElementById('exportOverlay').style.display = 'flex';
 }
 

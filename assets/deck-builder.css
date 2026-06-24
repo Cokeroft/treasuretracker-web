@@ -624,3 +624,24 @@
 @media (max-width: 640px) {
   .export-btn span, .export-btn { font-size: 11px; padding: 5px 9px; }
 }
+
+/* ── Go to TCGPlayer link button ── */
+.tcg-goto-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  background: var(--gold);
+  color: #111;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, opacity 0.15s;
+}
+.tcg-goto-btn:hover { background: var(--gold-dim); }
+.tcg-goto-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}

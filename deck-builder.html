@@ -58,6 +58,28 @@
     </div>
   </section>
 
+  <!-- Import modal — lives outside both leader-select and builder sections
+       so it's reachable from either screen regardless of which is hidden -->
+  <div id="importOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Import deck" style="display:none">
+    <div class="modal export-modal">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Import Deck</h2>
+          <p class="modal-sub">Paste an OPTCG Sim export list (e.g. "4xOP16-080") below</p>
+        </div>
+        <button class="close-btn" id="importCloseBtn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea id="importInputText" class="export-textarea" rows="10" placeholder="1xOP16-080&#10;3xOP09-095&#10;4xOP09-093&#10;..."></textarea>
+        <p class="import-error" id="importErrorMsg" style="display:none"></p>
+        <p class="import-summary" id="importSummaryMsg" style="display:none"></p>
+        <button class="modal-add-btn import-confirm-btn" id="importConfirmBtn">Import Deck</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ════════════════════════════════════════════════════════════
        STEP 2: DECK BUILDING (shown after a leader is picked)
   ════════════════════════════════════════════════════════════ -->
@@ -123,27 +145,6 @@
       </div>
     </div>
 
-    <!-- Import modal -->
-    <div id="importOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Import deck" style="display:none">
-      <div class="modal export-modal">
-        <div class="modal-header">
-          <div>
-            <h2 class="modal-title">Import Deck</h2>
-            <p class="modal-sub">Paste an OPTCG Sim export list (e.g. "4xOP16-080") below</p>
-          </div>
-          <button class="close-btn" id="importCloseBtn" aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <textarea id="importInputText" class="export-textarea" rows="10" placeholder="1xOP16-080&#10;3xOP09-095&#10;4xOP09-093&#10;..."></textarea>
-          <p class="import-error" id="importErrorMsg" style="display:none"></p>
-          <p class="import-summary" id="importSummaryMsg" style="display:none"></p>
-          <button class="modal-add-btn import-confirm-btn" id="importConfirmBtn">Import Deck</button>
-        </div>
-      </div>
-    </div>
-
     <!-- ── Browse view (with always-visible deck sidebar) ── -->
     <div id="browseView" class="builder-view">
       <div class="filters-bar">
@@ -192,7 +193,7 @@
           Your deck is empty. Switch to Browse Cards to start adding cards.
         </div>
         <div id="deckRulesWarnings" class="deck-rules-warnings"></div>
-        <div id="deckList" class="card-grid deck-grid"></div></div>
+        <div id="deckList" class="card-grid deck-grid"></div>
       </main>
     </div>
   </section>

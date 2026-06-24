@@ -348,7 +348,7 @@ function renderDeckList() {
       <div class="deck-row">
         ${thumb}
         <div class="deck-row-info" data-id="${card.id}">
-          <div class="deck-row-name">${escHtml(card.name || card.id)}</div>
+          <div class="deck-row-name">${colorDotHtml(card.color)} ${escHtml(card.name || card.id)}</div>
           <div class="deck-row-meta">
             <span>${card.id}</span>
             ${colorBadgeHtml(card.color)}
@@ -411,6 +411,7 @@ function renderSidebar() {
     return `
       <div class="sidebar-row">
         ${thumb}
+        ${colorDotHtml(card.color)}
         <span class="sidebar-row-name" data-id="${card.id}" title="${escHtml(card.name || card.id)}">${escHtml(card.name || card.id)}</span>
         <div class="sidebar-row-controls">
           <button class="sidebar-qty-btn" data-action="dec" data-id="${card.id}" aria-label="Remove one">−</button>
@@ -490,6 +491,26 @@ function colorBadgeHtml(colors) {
   if (colors.length > 1) return `<span class="badge badge-multi">${colors.join('/')}</span>`;
   const cls = COLOR_BADGE[colors[0]] || 'badge-gray';
   return `<span class="badge ${cls}">${colors[0]}</span>`;
+}
+
+// Returns a small color swatch (1 or 2 dots split diagonally for hybrid cards)
+// for use in compact rows like the deck sidebar, where badges are too wide.
+const COLOR_HEX = {
+  Red: '#ef4444', Green: '#22c55e', Blue: '#3b82f6',
+  Purple: '#a855f7', Black: '#9ca3af', Yellow: '#eab308',
+};
+
+function colorDotHtml(colors) {
+  if (!colors || !colors.length) return '<span class="color-dot color-dot-empty"></span>';
+  if (colors.length === 1) {
+    const hex = COLOR_HEX[colors[0]] || '#6b7280';
+    return `<span class="color-dot" style="background:${hex}" title="${escHtml(colors[0])}"></span>`;
+  }
+  // Hybrid: split gradient showing both colors, diagonal
+  const [c1, c2] = colors;
+  const hex1 = COLOR_HEX[c1] || '#6b7280';
+  const hex2 = COLOR_HEX[c2] || '#6b7280';
+  return `<span class="color-dot color-dot-split" style="background:linear-gradient(135deg, ${hex1} 50%, ${hex2} 50%)" title="${escHtml(colors.join('/'))}"></span>`;
 }
 
 function openCard(cardId) {

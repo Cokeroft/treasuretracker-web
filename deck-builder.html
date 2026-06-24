@@ -39,9 +39,15 @@
       <h1>Choose Your Leader</h1>
       <p class="leader-select-sub">Your Leader determines which colors you can play. Pick one to start building.</p>
 
-      <div class="leader-select-search-wrap">
-        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="leaderSearchInput" placeholder="Search leaders by name..." autocomplete="off">
+      <div class="leader-select-actions">
+        <div class="leader-select-search-wrap">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="leaderSearchInput" placeholder="Search leaders by name..." autocomplete="off">
+        </div>
+        <button class="import-btn" id="importBtnLeaderScreen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import Deck
+        </button>
       </div>
 
       <div id="leaderLoadingMsg" class="state-msg">
@@ -72,6 +78,10 @@
         <button class="export-btn" id="exportBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export
+        </button>
+        <button class="import-btn" id="importBtnBuilder">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import
         </button>
         <button class="change-leader-btn" id="changeLeaderBtn">Change Leader</button>
       </div>
@@ -109,6 +119,27 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import modal -->
+    <div id="importOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Import deck" style="display:none">
+      <div class="modal export-modal">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title">Import Deck</h2>
+            <p class="modal-sub">Paste an OPTCG Sim export list (e.g. "4xOP16-080") below</p>
+          </div>
+          <button class="close-btn" id="importCloseBtn" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <textarea id="importInputText" class="export-textarea" rows="10" placeholder="1xOP16-080&#10;3xOP09-095&#10;4xOP09-093&#10;..."></textarea>
+          <p class="import-error" id="importErrorMsg" style="display:none"></p>
+          <p class="import-summary" id="importSummaryMsg" style="display:none"></p>
+          <button class="modal-add-btn import-confirm-btn" id="importConfirmBtn">Import Deck</button>
         </div>
       </div>
     </div>

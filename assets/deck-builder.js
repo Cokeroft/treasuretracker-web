@@ -752,6 +752,14 @@ document.getElementById('copyTcgBtn').addEventListener('click', e => {
   copyToClipboard(document.getElementById('tcgExportText').value, e.target);
 });
 
+document.getElementById('importBtnLeaderScreen')?.addEventListener('click', openImportModal);
+document.getElementById('importBtnBuilder')?.addEventListener('click', openImportModal);
+document.getElementById('importCloseBtn').addEventListener('click', closeImportModal);
+document.getElementById('importOverlay').addEventListener('click', e => {
+  if (e.target.id === 'importOverlay') closeImportModal();
+});
+document.getElementById('importConfirmBtn').addEventListener('click', handleImportConfirm);
+
 document.getElementById('closeBtn').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 
@@ -887,6 +895,127 @@ async function copyToClipboard(text, btn) {
   btn.textContent = 'Copied!';
   btn.classList.add('copied');
   setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+}
+
+// ── Import ────────────────────────────────────────────────────────────────────
+function parseImportText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const parsed = [];
+  const errors = [];
+
+  for (const line of lines) {
+    const m = line.match(/^(\d+)\s*x\s*([A-Za-z0-9]+-\d+)$/i);
+    if (!m) {
+      errors.push(line);
+      continue;
+    }
+    parsed.push({ count: parseInt(m[1], 10), cardId: m[2].toUpperCase() });
+  }
+
+  return { parsed, errors };
+}
+
+function buildDeckFromImport(parsed) {
+  const notFound = [];
+  const skippedLeaders = [];
+  let detectedLeader = null;
+  const newDeck = new Map();
+
+  for (const { count, cardId } of parsed) {
+    const card = allCards.find(c => c.id === cardId);
+    if (!card) {
+      notFound.push(cardId);
+      continue;
+    }
+    if (card.type === 'Leader') {
+      // First Leader found in the list becomes the selected leader;
+      // any others are skipped (a deck only has one Leader)
+      if (!detectedLeader) {
+        detectedLeader = card;
+      } else {
+        skippedLeaders.push(cardId);
+      }
+      continue;
+    }
+    const existing = newDeck.get(cardId);
+    newDeck.set(cardId, {
+      card,
+      count: Math.min(MAX_COPIES, (existing?.count || 0) + count),
+      preferredVariantId: null,
+    });
+  }
+
+  return { newDeck, detectedLeader, notFound, skippedLeaders };
+}
+
+function openImportModal() {
+  document.getElementById('importInputText').value = '';
+  document.getElementById('importErrorMsg').style.display = 'none';
+  document.getElementById('importSummaryMsg').style.display = 'none';
+  document.getElementById('importOverlay').style.display = 'flex';
+}
+
+function closeImportModal() {
+  document.getElementById('importOverlay').style.display = 'none';
+}
+
+function handleImportConfirm() {
+  const text = document.getElementById('importInputText').value;
+  const errorEl = document.getElementById('importErrorMsg');
+  const summaryEl = document.getElementById('importSummaryMsg');
+  errorEl.style.display = 'none';
+  summaryEl.style.display = 'none';
+
+  const { parsed, errors } = parseImportText(text);
+
+  if (!parsed.length) {
+    errorEl.textContent = errors.length
+      ? `Couldn't parse any lines. Expected format like "4xOP16-080". ${errors.length} line(s) unrecognized.`
+      : 'Paste a deck list first.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const { newDeck, detectedLeader, notFound, skippedLeaders } = buildDeckFromImport(parsed);
+
+  if (!detectedLeader && !selectedLeader) {
+    errorEl.textContent = 'No Leader card found in the import list, and no Leader is currently selected. Include a Leader card ID in your import.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  // Apply the import
+  if (detectedLeader) {
+    selectedLeader = detectedLeader;
+  }
+  deck = newDeck;
+
+  // Build the summary message
+  const summaryParts = [`Imported ${[...newDeck.values()].reduce((s, e) => s + e.count, 0)} cards.`];
+  if (detectedLeader) summaryParts.push(`Leader set to ${detectedLeader.name || detectedLeader.id}.`);
+  if (notFound.length) summaryParts.push(`${notFound.length} card ID${notFound.length !== 1 ? 's' : ''} not found: ${notFound.join(', ')}.`);
+  if (skippedLeaders.length) summaryParts.push(`Extra Leader card${skippedLeaders.length !== 1 ? 's' : ''} ignored: ${skippedLeaders.join(', ')}.`);
+  if (errors.length) summaryParts.push(`${errors.length} line(s) couldn't be parsed and were skipped.`);
+
+  summaryEl.textContent = summaryParts.join(' ');
+  summaryEl.style.display = 'block';
+
+  // Switch into the builder view with the new deck loaded
+  document.getElementById('selLeaderImg').src = getMainImageUrl(selectedLeader) || '';
+  document.getElementById('selLeaderName').textContent = selectedLeader.name || selectedLeader.id;
+  document.getElementById('selLeaderMeta').textContent =
+    `${selectedLeader.id} · ${(selectedLeader.color || []).join('/')} · Life ${selectedLeader.life ?? '—'}`;
+
+  leaderSelectSection.style.display = 'none';
+  builderSection.style.display = 'block';
+
+  setView('browse');
+  renderPool();
+  updateDeckProgress();
+  requestAnimationFrame(updateSidebarOffset);
+  setTimeout(updateSidebarOffset, 200);
+
+  setTimeout(closeImportModal, 1200);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

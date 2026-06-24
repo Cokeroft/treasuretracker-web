@@ -329,6 +329,7 @@ function renderDeckList() {
   renderDeckRulesWarnings();
 
   const entries = [...deck.values()].sort((a, b) => a.card.id.localeCompare(b.card.id));
+  currentCardList = entries.map(e => e.card); // deck-order nav when modal opened from this view
 
   if (!entries.length) {
     deckList.style.display = 'none';
@@ -336,42 +337,50 @@ function renderDeckList() {
     return;
   }
   deckEmptyMsg.style.display = 'none';
-  deckList.style.display = 'flex';
+  deckList.style.display = 'grid';
 
   deckList.innerHTML = entries.map(({ card, count }) => {
     const img = getMainImageUrl(card);
-    const thumb = img
-      ? `<img class="deck-row-thumb" src="${img}" alt="${escHtml(card.name || card.id)}" data-id="${card.id}" loading="lazy">`
-      : `<div class="deck-row-thumb-ph" data-id="${card.id}">${cardIconSvg()}</div>`;
+    const imgHtml = img
+      ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${escHtml(card.name || card.id)}" loading="lazy" data-fallback="1"></div>`
+      : `<div class="card-img-wrap"><div class="card-img-ph">${cardIconSvg()}</div></div>`;
 
     return `
-      <div class="deck-row">
-        ${thumb}
-        <div class="deck-row-info" data-id="${card.id}">
-          <div class="deck-row-name">${colorDotHtml(card.color)} ${escHtml(card.name || card.id)}</div>
-          <div class="deck-row-meta">
-            <span>${card.id}</span>
-            ${colorBadgeHtml(card.color)}
-            <span class="badge badge-gray">${card.type}</span>
+      <div class="deck-card-wrap">
+        <article class="card" data-id="${card.id}" tabindex="0">
+          ${imgHtml}
+          <div class="card-body">
+            <div class="card-id">${card.id}</div>
+            <div class="card-name">${colorDotHtml(card.color)} ${escHtml(card.name || '—')}</div>
+            <div class="card-meta">
+              ${colorBadgeHtml(card.color)}
+              <span class="badge badge-gray">${card.type}</span>
+            </div>
           </div>
-        </div>
-        <div class="deck-row-controls">
+        </article>
+        <span class="pool-card-count-badge">${count}</span>
+        <div class="deck-card-controls">
           <button class="deck-qty-btn" data-action="dec" data-id="${card.id}" aria-label="Remove one">−</button>
-          <span class="deck-qty-count">${count}</span>
           <button class="deck-qty-btn" data-action="inc" data-id="${card.id}" ${count >= MAX_COPIES ? 'disabled' : ''} aria-label="Add one">+</button>
-          <button class="deck-row-remove" data-action="remove" data-id="${card.id}" aria-label="Remove all copies">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          <button class="deck-card-remove" data-action="remove" data-id="${card.id}" aria-label="Remove all copies" title="Remove all copies">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
           </button>
         </div>
       </div>`;
   }).join('');
 
-  deckList.querySelectorAll('.deck-row-info, .deck-row-thumb, .deck-row-thumb-ph').forEach(el => {
+  deckList.querySelectorAll('.card').forEach(el => {
     el.addEventListener('click', () => { modalContext = 'deck'; openCard(el.dataset.id); });
   });
-  deckList.querySelectorAll('[data-action="inc"]').forEach(btn => btn.addEventListener('click', () => addToDeck(btn.dataset.id)));
-  deckList.querySelectorAll('[data-action="dec"]').forEach(btn => btn.addEventListener('click', () => removeFromDeck(btn.dataset.id)));
-  deckList.querySelectorAll('[data-action="remove"]').forEach(btn => btn.addEventListener('click', () => removeFromDeck(btn.dataset.id, true)));
+  deckList.querySelectorAll('[data-action="inc"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); addToDeck(btn.dataset.id); }));
+  deckList.querySelectorAll('[data-action="dec"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); removeFromDeck(btn.dataset.id); }));
+  deckList.querySelectorAll('[data-action="remove"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); removeFromDeck(btn.dataset.id, true); }));
+
+  deckList.querySelectorAll('img[data-fallback]').forEach(img => {
+    const card = entries.map(e => e.card).find(c => c.id === img.closest('.card').dataset.id);
+    const urls = card ? getImageUrls(card) : [];
+    attachSmartFallback(img, urls, `<div class="card-img-ph">${cardIconSvg()}</div>`);
+  });
 }
 
 // ── Sidebar (always-visible deck list while browsing) ────────────────────────

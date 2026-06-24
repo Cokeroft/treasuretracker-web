@@ -243,9 +243,7 @@
 
 .pool-card-maxed { opacity: 0.45; }
 
-/* ── Deck list view ── */
-.deck-view-content { max-width: 900px; }
-
+/* ── Deck list view (full card grid, mirrors browse pool) ── */
 .deck-rules-warnings {
   margin-bottom: 16px;
 }
@@ -263,75 +261,17 @@
   gap: 8px;
 }
 
-.deck-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.deck-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 
-.deck-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
-  transition: border-color 0.15s;
-}
-.deck-row:hover { border-color: var(--border-mid); }
+.deck-card-wrap { position: relative; }
 
-.deck-row-thumb {
-  width: 36px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-  background: var(--bg-raised);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.deck-row-thumb-ph {
-  width: 36px;
-  height: 50px;
-  border-radius: 4px;
-  background: var(--bg-raised);
+.deck-card-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--border-mid);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.deck-row-info {
-  flex: 1;
-  min-width: 0;
-  cursor: pointer;
-}
-
-.deck-row-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.deck-row-meta {
-  font-size: 11px;
-  color: var(--text-3);
-  display: flex;
   gap: 6px;
-  align-items: center;
-  margin-top: 2px;
-}
-
-.deck-row-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  margin-top: 6px;
+  padding: 0 2px;
 }
 
 .deck-qty-btn {
@@ -354,24 +294,21 @@
 .deck-qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .deck-qty-btn:disabled:hover { background: var(--bg-input); border-color: var(--border-mid); color: var(--text-1); }
 
-.deck-qty-count {
-  min-width: 22px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-1);
-}
-
-.deck-row-remove {
-  background: none;
-  border: none;
+.deck-card-remove {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
   color: var(--text-3);
   cursor: pointer;
-  padding: 4px;
+  width: 24px;
+  height: 24px;
   display: flex;
-  transition: color 0.15s;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  transition: color 0.15s, border-color 0.15s;
 }
-.deck-row-remove:hover { color: #f87171; }
+.deck-card-remove:hover { color: #f87171; border-color: #f87171; }
 
 /* ── Modal deck add/remove section ── */
 .modal-deck-actions {
@@ -612,4 +549,4 @@
 .color-dot-empty { background: var(--border-mid); }
 
 .sidebar-row .color-dot { margin: 0 2px; }
-.deck-row-name .color-dot { margin-right: 2px; }
+.card-name .color-dot { margin-right: 2px; }

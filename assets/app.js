@@ -20,7 +20,7 @@ const ALL_SETS = [
   { code: 'OP15',  name: "Adventure on Kami's Island",  group: 'booster', available: true  },
   { code: 'OP16',  name: 'The Time of Battle',          group: 'booster', available: true  },
   { code: 'PRB01', name: 'Premium Booster The Best',    group: 'booster', available: false },
-  { code: 'PRB02', name: 'Premium Booster The Best Vol.2', group: 'booster', available: false },
+  { code: 'PRB02', name: 'Premium Booster The Best Vol.2', group: 'booster', available: true  },
   // ── Starter Decks ──
   { code: 'ST01',  name: 'Straw Hat Crew',                  group: 'starter', available: true  },
   { code: 'ST02',  name: 'Worst Generation',                group: 'starter', available: true  },

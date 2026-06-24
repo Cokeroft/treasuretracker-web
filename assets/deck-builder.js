@@ -11,7 +11,7 @@ const ALL_SETS = [
   { code: 'OP11',  available: true }, { code: 'OP12',  available: true },
   { code: 'OP13',  available: true }, { code: 'OP14',  available: true },
   { code: 'OP15',  available: true }, { code: 'OP16',  available: true },
-  { code: 'PRB01', available: false },{ code: 'PRB02', available: false },
+  { code: 'PRB01', available: false },{ code: 'PRB02', available: true },
   { code: 'ST01',  available: true }, { code: 'ST02',  available: true },
   { code: 'ST03',  available: true }, { code: 'ST04',  available: true },
   { code: 'ST05',  available: false },{ code: 'ST06',  available: false },

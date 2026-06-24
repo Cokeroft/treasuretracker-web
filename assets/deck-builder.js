@@ -994,7 +994,10 @@ function buildDeckFromImport(parsed) {
   return { newDeck, detectedLeader, notFound, skippedLeaders };
 }
 
+let importAutoCloseTimer = null;
+
 function openImportModal() {
+  clearTimeout(importAutoCloseTimer);
   document.getElementById('importInputText').value = '';
   document.getElementById('importErrorMsg').style.display = 'none';
   document.getElementById('importSummaryMsg').style.display = 'none';
@@ -1002,6 +1005,7 @@ function openImportModal() {
 }
 
 function closeImportModal() {
+  clearTimeout(importAutoCloseTimer);
   document.getElementById('importOverlay').style.display = 'none';
 }
 
@@ -1061,7 +1065,7 @@ function handleImportConfirm() {
   requestAnimationFrame(updateSidebarOffset);
   setTimeout(updateSidebarOffset, 200);
 
-  setTimeout(closeImportModal, 1200);
+  importAutoCloseTimer = setTimeout(closeImportModal, 15000);
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

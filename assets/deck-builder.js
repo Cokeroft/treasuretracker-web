@@ -5,7 +5,7 @@ const API_BASE = 'https://treasuretracker-production.up.railway.app';
 const ALL_SETS = [
   { code: 'OP01',  available: true }, { code: 'OP02',  available: true },
   { code: 'OP03',  available: true }, { code: 'OP04',  available: true },
-  { code: 'OP05',  available: false },{ code: 'OP06',  available: false },
+  { code: 'OP05',  available: false },{ code: 'OP06',  available: true },
   { code: 'OP07',  available: true }, { code: 'OP08',  available: true },
   { code: 'OP09',  available: true }, { code: 'OP10',  available: true },
   { code: 'OP11',  available: true }, { code: 'OP12',  available: true },

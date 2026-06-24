@@ -787,11 +787,19 @@ function extractProductId(url) {
   return m ? m[1] : null;
 }
 
-// Picks the variant whose product page we export by default — same priority
-// as the main site's hero image (Normal/Parallel from booster/starter, etc.)
+// Picks the variant whose product page we export — respects the art the
+// person explicitly selected for this card in their deck, falling back to
+// the same default priority as the main site's hero image otherwise.
 function getExportVariant(card) {
   const variants = (card.variants || []).filter(v => v.tcgplayer_url);
   if (!variants.length) return null;
+
+  const entry = deck.get(card.id);
+  if (entry?.preferredVariantId) {
+    const preferred = variants.find(v => v.variant_id === entry.preferredVariantId);
+    if (preferred) return preferred;
+  }
+
   for (const { label, methods } of LABEL_PRIORITY) {
     const match = variants.find(v => (v.label || '').toLowerCase().startsWith(label) && methods.includes(v.acquisition?.method));
     if (match) return match;

@@ -7,7 +7,7 @@ const ALL_SETS = [
   { code: 'OP02',  name: 'Paramount War',               group: 'booster', available: true  },
   { code: 'OP03',  name: 'Pillars of Strength',         group: 'booster', available: true  },
   { code: 'OP04',  name: 'Kingdoms of Intrigue',        group: 'booster', available: true  },
-  { code: 'OP05',  name: 'Awakening of the New Era',    group: 'booster', available: false },
+  { code: 'OP05',  name: 'Awakening of the New Era',    group: 'booster', available: true  },
   { code: 'OP06',  name: 'Wings of the Captain',        group: 'booster', available: true  },
   { code: 'OP07',  name: '500 Years in the Future',     group: 'booster', available: true  },
   { code: 'OP08',  name: 'Two Legends',                 group: 'booster', available: true  },

@@ -11,7 +11,7 @@ const ALL_SETS = [
   { code: 'OP06',  name: 'Wings of the Captain',        group: 'booster', available: false },
   { code: 'OP07',  name: '500 Years in the Future',     group: 'booster', available: false },
   { code: 'OP08',  name: 'Two Legends',                 group: 'booster', available: false },
-  { code: 'OP09',  name: 'The Four Emperors',           group: 'booster', available: false },
+  { code: 'OP09',  name: 'Emperors in the New World',   group: 'booster', available: true  },
   { code: 'OP10',  name: 'Royal Blood',                 group: 'booster', available: true  },
   { code: 'OP11',  name: 'A Fist of Divine Speed',      group: 'booster', available: true  },
   { code: 'OP12',  name: 'Legacy of the Master',        group: 'booster', available: true  },

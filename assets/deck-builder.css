@@ -549,3 +549,78 @@
 
 .sidebar-row .color-dot { margin: 0 2px; }
 .card-name .color-dot { margin-right: 2px; }
+
+/* ── Export button & modal ── */
+.export-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.export-btn:hover { border-color: var(--gold-dim); color: var(--text-1); }
+
+.export-modal { max-width: 640px; }
+
+.export-section { margin-bottom: 20px; }
+.export-section:last-child { margin-bottom: 0; }
+
+.export-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.export-section-header span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.export-copy-btn {
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.export-copy-btn.copied { background: #4ade80; }
+
+.export-textarea {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: 'SF Mono', Consolas, monospace;
+  color: var(--text-1);
+  resize: vertical;
+  line-height: 1.6;
+}
+.export-textarea:focus { outline: none; border-color: var(--gold-dim); }
+
+.export-note {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .export-btn span, .export-btn { font-size: 11px; padding: 5px 9px; }
+}

@@ -69,7 +69,43 @@
           <div class="deck-progress-count"><span id="deckMainCount">0</span> / 50</div>
           <div class="deck-progress-bar"><div class="deck-progress-fill" id="deckProgressFill"></div></div>
         </div>
+        <button class="export-btn" id="exportBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
         <button class="change-leader-btn" id="changeLeaderBtn">Change Leader</button>
+      </div>
+    </div>
+
+    <!-- Export modal -->
+    <div id="exportOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="Export deck" style="display:none">
+      <div class="modal export-modal">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title">Export Deck</h2>
+            <p class="modal-sub">Copy your deck list in either format below</p>
+          </div>
+          <button class="close-btn" id="exportCloseBtn" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="export-section">
+            <div class="export-section-header">
+              <span>OPTCG Sim Export</span>
+              <button class="export-copy-btn" id="copySimBtn">Copy</button>
+            </div>
+            <textarea id="simExportText" class="export-textarea" readonly rows="8"></textarea>
+          </div>
+          <div class="export-section">
+            <div class="export-section-header">
+              <span>TCGPlayer Mass Entry</span>
+              <button class="export-copy-btn" id="copyTcgBtn">Copy</button>
+            </div>
+            <textarea id="tcgExportText" class="export-textarea" readonly rows="8"></textarea>
+            <p class="export-note" id="tcgExportNote"></p>
+          </div>
+        </div>
       </div>
     </div>
 

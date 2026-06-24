@@ -692,6 +692,18 @@ document.querySelectorAll('.db-view-btn').forEach(btn => {
 
 document.getElementById('changeLeaderBtn').addEventListener('click', changeLeader);
 
+document.getElementById('exportBtn').addEventListener('click', openExportModal);
+document.getElementById('exportCloseBtn').addEventListener('click', closeExportModal);
+document.getElementById('exportOverlay').addEventListener('click', e => {
+  if (e.target.id === 'exportOverlay') closeExportModal();
+});
+document.getElementById('copySimBtn').addEventListener('click', e => {
+  copyToClipboard(document.getElementById('simExportText').value, e.target);
+});
+document.getElementById('copyTcgBtn').addEventListener('click', e => {
+  copyToClipboard(document.getElementById('tcgExportText').value, e.target);
+});
+
 document.getElementById('closeBtn').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 
@@ -720,6 +732,89 @@ function updateSidebarOffset() {
 }
 
 window.addEventListener('resize', updateSidebarOffset);
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function extractProductId(url) {
+  const m = (url || '').match(/\/product\/(\d+)\//);
+  return m ? m[1] : null;
+}
+
+// Picks the variant whose product page we export by default — same priority
+// as the main site's hero image (Normal/Parallel from booster/starter, etc.)
+function getExportVariant(card) {
+  const variants = (card.variants || []).filter(v => v.tcgplayer_url);
+  if (!variants.length) return null;
+  for (const { label, methods } of LABEL_PRIORITY) {
+    const match = variants.find(v => (v.label || '').toLowerCase().startsWith(label) && methods.includes(v.acquisition?.method));
+    if (match) return match;
+  }
+  return variants[0];
+}
+
+function buildSimExport() {
+  const lines = [];
+  if (selectedLeader) {
+    lines.push(`1x${selectedLeader.id}`);
+  }
+  const entries = [...deck.values()].sort((a, b) => a.card.id.localeCompare(b.card.id));
+  for (const { card, count } of entries) {
+    lines.push(`${count}x${card.id}`);
+  }
+  return lines.join('\n');
+}
+
+function buildTcgExport() {
+  const lines = [];
+  const missing = [];
+  const entries = [...deck.values()].sort((a, b) => a.card.id.localeCompare(b.card.id));
+
+  // Include the leader too — it's part of the physical deck purchase
+  const allEntries = selectedLeader ? [{ card: selectedLeader, count: 1 }, ...entries] : entries;
+
+  for (const { card, count } of allEntries) {
+    const variant = getExportVariant(card);
+    const productId = variant ? extractProductId(variant.tcgplayer_url) : null;
+    if (productId) {
+      lines.push(`${count}-${productId}`);
+    } else {
+      missing.push(card.name || card.id);
+    }
+  }
+  return { text: lines.join('\n'), missing };
+}
+
+function openExportModal() {
+  document.getElementById('simExportText').value = buildSimExport();
+  const { text, missing } = buildTcgExport();
+  document.getElementById('tcgExportText').value = text;
+  const noteEl = document.getElementById('tcgExportNote');
+  noteEl.textContent = missing.length
+    ? `Note: ${missing.length} card${missing.length !== 1 ? 's' : ''} couldn't be matched to a TCGPlayer listing and ${missing.length !== 1 ? 'were' : 'was'} skipped: ${missing.join(', ')}`
+    : '';
+  document.getElementById('exportOverlay').style.display = 'flex';
+}
+
+function closeExportModal() {
+  document.getElementById('exportOverlay').style.display = 'none';
+}
+
+async function copyToClipboard(text, btn) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Fallback for environments without clipboard API permission
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const original = btn.textContent;
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {

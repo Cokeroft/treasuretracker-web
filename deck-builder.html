@@ -73,7 +73,7 @@
       </div>
     </div>
 
-    <!-- ── Browse view ── -->
+    <!-- ── Browse view (with always-visible deck sidebar) ── -->
     <div id="browseView" class="builder-view">
       <div class="filters-bar">
         <div class="filters-inner">
@@ -95,10 +95,21 @@
           </select>
         </div>
       </div>
-      <main class="main-content">
-        <div id="poolEmptyMsg" class="state-msg" style="display:none">No cards match your search.</div>
-        <div id="poolGrid" class="card-grid"></div>
-      </main>
+      <div class="browse-layout">
+        <main class="main-content browse-pool-area">
+          <div id="poolEmptyMsg" class="state-msg" style="display:none">No cards match your search.</div>
+          <div id="poolGrid" class="card-grid"></div>
+        </main>
+        <aside class="deck-sidebar">
+          <div class="deck-sidebar-header">
+            <span>Current Deck</span>
+            <span class="deck-sidebar-count" id="sidebarDeckCount">0 / 50</span>
+          </div>
+          <div id="sidebarDeckRulesWarnings" class="deck-rules-warnings"></div>
+          <div id="sidebarEmptyMsg" class="deck-sidebar-empty">No cards added yet.</div>
+          <div id="sidebarDeckList" class="deck-sidebar-list"></div>
+        </aside>
+      </div>
     </div>
 
     <!-- ── Deck view ── -->

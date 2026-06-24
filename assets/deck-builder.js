@@ -229,6 +229,7 @@ function renderPool() {
           </div>
         </article>
         ${count > 0 ? `<span class="pool-card-count-badge">${count}</span>` : ''}
+        ${count > 0 ? `<button class="pool-sub-btn" data-id="${card.id}" title="Remove one" aria-label="Remove one ${escHtml(card.name || card.id)} from deck">−</button>` : ''}
         <button class="pool-add-btn" data-id="${card.id}" title="Add to deck" aria-label="Add ${escHtml(card.name || card.id)} to deck" ${maxed ? 'disabled' : ''}>+</button>
       </div>`;
   }).join('');
@@ -244,11 +245,20 @@ function renderPool() {
     });
   });
 
+  poolGrid.querySelectorAll('.pool-sub-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      removeFromDeck(btn.dataset.id);
+    });
+  });
+
   poolGrid.querySelectorAll('img[data-fallback]').forEach(img => {
     const card = cards.find(c => c.id === img.closest('.card').dataset.id);
     const urls = card ? getImageUrls(card) : [];
     attachSmartFallback(img, urls, `<div class="card-img-ph">${cardIconSvg()}</div>`);
   });
+
+  renderSidebar();
 }
 
 // ── Deck management ───────────────────────────────────────────────────────────
@@ -266,7 +276,7 @@ function addToDeck(cardId) {
   if (count >= MAX_COPIES) return;
   deck.set(cardId, { card, count: count + 1 });
   updateDeckProgress();
-  renderPool();
+  if (currentView === 'browse') renderPool();
   if (currentView === 'deck') renderDeckList();
   updateModalDeckActions();
 }
@@ -362,6 +372,64 @@ function renderDeckList() {
   deckList.querySelectorAll('[data-action="inc"]').forEach(btn => btn.addEventListener('click', () => addToDeck(btn.dataset.id)));
   deckList.querySelectorAll('[data-action="dec"]').forEach(btn => btn.addEventListener('click', () => removeFromDeck(btn.dataset.id)));
   deckList.querySelectorAll('[data-action="remove"]').forEach(btn => btn.addEventListener('click', () => removeFromDeck(btn.dataset.id, true)));
+}
+
+// ── Sidebar (always-visible deck list while browsing) ────────────────────────
+function renderSidebar() {
+  const sidebarCount = document.getElementById('sidebarDeckCount');
+  const sidebarEmpty = document.getElementById('sidebarEmptyMsg');
+  const sidebarList  = document.getElementById('sidebarDeckList');
+  const sidebarWarnings = document.getElementById('sidebarDeckRulesWarnings');
+  if (!sidebarList) return;
+
+  const total = getMainDeckCount();
+  sidebarCount.textContent = `${total} / ${DECK_SIZE}`;
+  sidebarCount.style.color = total === DECK_SIZE ? '#4ade80' : total > DECK_SIZE ? '#f87171' : '';
+
+  const warnings = [];
+  if (total > DECK_SIZE) warnings.push(`${total - DECK_SIZE} too many`);
+  sidebarWarnings.innerHTML = warnings.length
+    ? `<div class="deck-warning" style="font-size:11px;padding:5px 8px">${warnings[0]}</div>`
+    : '';
+
+  const entries = [...deck.values()].sort((a, b) => a.card.id.localeCompare(b.card.id));
+
+  if (!entries.length) {
+    sidebarList.style.display = 'none';
+    sidebarEmpty.style.display = 'block';
+    return;
+  }
+  sidebarEmpty.style.display = 'none';
+  sidebarList.style.display = 'flex';
+
+  sidebarList.innerHTML = entries.map(({ card, count }) => {
+    const img = getMainImageUrl(card);
+    const thumb = img
+      ? `<img class="sidebar-row-thumb" src="${img}" alt="${escHtml(card.name || card.id)}" data-id="${card.id}" loading="lazy">`
+      : `<div class="sidebar-row-thumb-ph" data-id="${card.id}">${cardIconSvg()}</div>`;
+
+    return `
+      <div class="sidebar-row">
+        ${thumb}
+        <span class="sidebar-row-name" data-id="${card.id}" title="${escHtml(card.name || card.id)}">${escHtml(card.name || card.id)}</span>
+        <div class="sidebar-row-controls">
+          <button class="sidebar-qty-btn" data-action="dec" data-id="${card.id}" aria-label="Remove one">−</button>
+          <span class="sidebar-qty-count">${count}</span>
+          <button class="sidebar-qty-btn" data-action="inc" data-id="${card.id}" ${count >= MAX_COPIES ? 'disabled' : ''} aria-label="Add one">+</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  sidebarList.querySelectorAll('.sidebar-row-thumb, .sidebar-row-thumb-ph, .sidebar-row-name').forEach(el => {
+    el.addEventListener('click', () => {
+      modalContext = 'deck';
+      // Use the deck (sorted) order for prev/next nav when opened from sidebar
+      currentCardList = entries.map(e => e.card);
+      openCard(el.dataset.id);
+    });
+  });
+  sidebarList.querySelectorAll('[data-action="inc"]').forEach(btn => btn.addEventListener('click', () => addToDeck(btn.dataset.id)));
+  sidebarList.querySelectorAll('[data-action="dec"]').forEach(btn => btn.addEventListener('click', () => removeFromDeck(btn.dataset.id)));
 }
 
 // ── View switching ────────────────────────────────────────────────────────────

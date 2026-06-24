@@ -405,7 +405,181 @@
 }
 .modal-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Responsive ── */
+/* ── Browse layout with sidebar ── */
+.browse-layout {
+  display: flex;
+  gap: 0;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.browse-pool-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.deck-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding: 16px;
+  position: sticky;
+  top: 113px;
+  align-self: flex-start;
+  max-height: calc(100vh - 113px);
+  overflow-y: auto;
+}
+
+.deck-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.deck-sidebar-header span:first-child {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.deck-sidebar-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.deck-sidebar-empty {
+  color: var(--text-3);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.deck-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.sidebar-row:hover { background: var(--bg-input); }
+
+.sidebar-row-thumb {
+  width: 26px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: var(--bg-raised);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.sidebar-row-thumb-ph {
+  width: 26px;
+  height: 36px;
+  border-radius: 3px;
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--border-mid);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.sidebar-row-thumb-ph svg { width: 14px; height: 14px; }
+
+.sidebar-row-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.sidebar-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.sidebar-qty-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  color: var(--text-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.sidebar-qty-btn:hover { background: var(--gold); border-color: var(--gold); color: #111; }
+.sidebar-qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.sidebar-qty-btn:disabled:hover { background: var(--bg-input); border-color: var(--border-mid); color: var(--text-1); }
+
+.sidebar-qty-count {
+  min-width: 14px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+/* ── Minus button on pool cards (mirrors pool-add-btn) ── */
+.pool-sub-btn {
+  position: absolute;
+  bottom: 38px;
+  right: 38px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.1s, background 0.15s;
+  z-index: 2;
+}
+.pool-sub-btn:hover { background: #f87171; border-color: #f87171; color: #111; transform: scale(1.1); }
+.pool-sub-btn:active { transform: scale(0.95); }
+
+@media (max-width: 900px) {
+  .browse-layout { flex-direction: column; }
+  .deck-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    position: static;
+    max-height: none;
+  }
+}
+
 @media (max-width: 640px) {
   .db-topbar-tabs { display: none; }
   .selected-leader-inner { padding: 8px 16px; gap: 10px; flex-wrap: wrap; }

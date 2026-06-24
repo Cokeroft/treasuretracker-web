@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deck Builder — TreasureTracker</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/deck-builder.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+</head>
+<body>
+
+  <!-- ── Top bar ── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        TreasureTracker
+      </a>
+      <div class="db-topbar-tabs">
+        <a href="index.html" class="db-topbar-tab">Browse</a>
+        <span class="db-topbar-tab active">Deck Builder</span>
+      </div>
+      <div class="db-view-toggle" id="viewToggle">
+        <button class="db-view-btn active" data-view="browse">Browse Cards</button>
+        <button class="db-view-btn" data-view="deck">
+          My Deck <span class="db-deck-count" id="deckCountBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════════
+       STEP 1: LEADER SELECTION (shown until a leader is picked)
+  ════════════════════════════════════════════════════════════ -->
+  <section id="leaderSelectSection" class="leader-select-section">
+    <div class="leader-select-inner">
+      <h1>Choose Your Leader</h1>
+      <p class="leader-select-sub">Your Leader determines which colors you can play. Pick one to start building.</p>
+
+      <div class="leader-select-search-wrap">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="leaderSearchInput" placeholder="Search leaders by name..." autocomplete="off">
+      </div>
+
+      <div id="leaderLoadingMsg" class="state-msg">
+        <div class="spinner"></div>
+        Loading leaders...
+      </div>
+      <div id="leaderGrid" class="card-grid leader-grid" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       STEP 2: DECK BUILDING (shown after a leader is picked)
+  ════════════════════════════════════════════════════════════ -->
+  <section id="builderSection" class="builder-section" style="display:none">
+
+    <!-- Selected leader bar -->
+    <div class="selected-leader-bar">
+      <div class="selected-leader-inner">
+        <img id="selLeaderImg" class="selected-leader-img" src="" alt="">
+        <div class="selected-leader-info">
+          <div class="selected-leader-name" id="selLeaderName"></div>
+          <div class="selected-leader-meta" id="selLeaderMeta"></div>
+        </div>
+        <div class="deck-progress" id="deckProgress">
+          <div class="deck-progress-count"><span id="deckMainCount">0</span> / 50</div>
+          <div class="deck-progress-bar"><div class="deck-progress-fill" id="deckProgressFill"></div></div>
+        </div>
+        <button class="change-leader-btn" id="changeLeaderBtn">Change Leader</button>
+      </div>
+    </div>
+
+    <!-- ── Browse view ── -->
+    <div id="browseView" class="builder-view">
+      <div class="filters-bar">
+        <div class="filters-inner">
+          <div class="search-wrap" style="max-width:320px">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="poolSearchInput" placeholder="Search by name or card ID..." autocomplete="off">
+          </div>
+          <span class="filter-label">Type</span>
+          <div class="pills" id="poolTypePills">
+            <button class="pill active" data-value="all">All</button>
+            <button class="pill" data-value="Character">Character</button>
+            <button class="pill" data-value="Event">Event</button>
+            <button class="pill" data-value="Stage">Stage</button>
+          </div>
+          <select id="poolSortSelect" class="sort-select" aria-label="Sort cards">
+            <option value="id">Sort: Card #</option>
+            <option value="cost">Cost</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
+      <main class="main-content">
+        <div id="poolEmptyMsg" class="state-msg" style="display:none">No cards match your search.</div>
+        <div id="poolGrid" class="card-grid"></div>
+      </main>
+    </div>
+
+    <!-- ── Deck view ── -->
+    <div id="deckView" class="builder-view" style="display:none">
+      <main class="main-content deck-view-content">
+        <div id="deckEmptyMsg" class="state-msg">
+          Your deck is empty. Switch to Browse Cards to start adding cards.
+        </div>
+        <div id="deckRulesWarnings" class="deck-rules-warnings"></div>
+        <div id="deckList" class="deck-list"></div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ── Card Detail Modal (shared, reused from main site pattern) ── -->
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Card detail" style="display:none">
+    <button class="modal-nav-btn prev" id="modalPrevBtn" aria-label="Previous card" title="Previous card">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="mTitle"></h2>
+          <p class="modal-sub" id="mSub"></p>
+        </div>
+        <button class="close-btn" id="closeBtn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card-overview">
+          <div class="main-img-wrap">
+            <img id="mImg" src="" alt="" class="main-img" style="display:none">
+            <div id="mImgPh" class="main-img-ph">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+            </div>
+          </div>
+          <div class="card-attrs" id="mAttrs"></div>
+        </div>
+        <div class="effect-section" id="mEffectWrap" style="display:none">
+          <div class="effect-label">Card effect</div>
+          <p class="effect-text" id="mEffect"></p>
+        </div>
+        <div class="modal-deck-actions" id="modalDeckActions"></div>
+        <h3 class="variants-heading" id="vHeading"></h3>
+        <div class="variants-grid" id="vGrid"></div>
+      </div>
+    </div>
+    <button class="modal-nav-btn next" id="modalNextBtn" aria-label="Next card" title="Next card">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <script src="assets/deck-builder.js"></script>
+</body>
+</html>

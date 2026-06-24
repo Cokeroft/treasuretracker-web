@@ -1,0 +1,415 @@
+/* ── Topbar tabs (Browse / Deck Builder) ── */
+.db-topbar-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.db-topbar-tab {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.db-topbar-tab:hover { color: var(--text-1); background: var(--bg-input); }
+.db-topbar-tab.active { color: var(--gold); background: var(--bg-input); }
+
+/* ── Browse/Deck view toggle ── */
+.db-view-toggle {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.db-view-btn {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.db-view-btn.active {
+  background: var(--gold);
+  color: #111;
+}
+
+.db-deck-count {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.db-view-btn:not(.active) .db-deck-count {
+  background: var(--bg-surface);
+  color: var(--text-2);
+}
+
+/* ── Leader selection screen ── */
+.leader-select-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+.leader-select-inner h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.leader-select-sub {
+  text-align: center;
+  color: var(--text-2);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.leader-select-search-wrap {
+  position: relative;
+  max-width: 420px;
+  margin: 0 auto 28px;
+}
+
+.leader-select-search-wrap input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  padding: 9px 14px 9px 36px;
+  font-size: 14px;
+  color: var(--text-1);
+  font-family: inherit;
+  outline: none;
+}
+.leader-select-search-wrap input:focus { border-color: var(--gold-dim); }
+.leader-select-search-wrap .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+}
+
+.leader-grid {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.leader-grid .card { cursor: pointer; }
+
+/* ── Selected leader bar ── */
+.selected-leader-bar {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 45;
+}
+
+.selected-leader-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.selected-leader-img {
+  width: 44px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--bg-raised);
+}
+
+.selected-leader-info { min-width: 0; }
+.selected-leader-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.selected-leader-meta {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.deck-progress {
+  margin-left: auto;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.deck-progress-count {
+  font-size: 12px;
+  color: var(--text-2);
+  text-align: right;
+  margin-bottom: 4px;
+}
+.deck-progress-count span { font-weight: 600; color: var(--text-1); }
+
+.deck-progress-bar {
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.deck-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  width: 0%;
+  transition: width 0.2s, background 0.2s;
+}
+.deck-progress-fill.over { background: #f87171; }
+.deck-progress-fill.complete { background: #4ade80; }
+
+.change-leader-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.change-leader-btn:hover { border-color: var(--gold-dim); color: var(--text-1); }
+
+/* ── Card pool grid: add overlay button on hover ── */
+.pool-card-wrap { position: relative; }
+
+.pool-add-btn {
+  position: absolute;
+  bottom: 38px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #111;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.1s;
+  z-index: 2;
+}
+.pool-add-btn:hover { transform: scale(1.1); }
+.pool-add-btn:active { transform: scale(0.95); }
+
+.pool-card-count-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--gold);
+  color: #111;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.pool-card-maxed { opacity: 0.45; }
+
+/* ── Deck list view ── */
+.deck-view-content { max-width: 900px; }
+
+.deck-rules-warnings {
+  margin-bottom: 16px;
+}
+
+.deck-warning {
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #fca5a5;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.deck-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  transition: border-color 0.15s;
+}
+.deck-row:hover { border-color: var(--border-mid); }
+
+.deck-row-thumb {
+  width: 36px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.deck-row-thumb-ph {
+  width: 36px;
+  height: 50px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--border-mid);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.deck-row-info {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.deck-row-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deck-row-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.deck-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.deck-qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  color: var(--text-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+.deck-qty-btn:hover { background: var(--gold); border-color: var(--gold); color: #111; }
+.deck-qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.deck-qty-btn:disabled:hover { background: var(--bg-input); border-color: var(--border-mid); color: var(--text-1); }
+
+.deck-qty-count {
+  min-width: 22px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.deck-row-remove {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  transition: color 0.15s;
+}
+.deck-row-remove:hover { color: #f87171; }
+
+/* ── Modal deck add/remove section ── */
+.modal-deck-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-raised);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.modal-deck-actions-label {
+  font-size: 12px;
+  color: var(--text-3);
+  flex: 1;
+}
+
+.modal-deck-actions .deck-qty-btn { width: 28px; height: 28px; }
+
+.modal-add-btn {
+  background: var(--gold);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  font-family: inherit;
+}
+.modal-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .db-topbar-tabs { display: none; }
+  .selected-leader-inner { padding: 8px 16px; gap: 10px; flex-wrap: wrap; }
+  .deck-progress { min-width: 100px; }
+  .change-leader-btn { font-size: 11px; padding: 5px 9px; }
+  .leader-select-inner h1 { font-size: 20px; }
+}

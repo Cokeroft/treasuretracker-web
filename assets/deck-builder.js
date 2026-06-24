@@ -162,6 +162,17 @@ function changeLeader() {
   renderLeaderGrid();
 }
 
+function clearDeck() {
+  if (deck.size === 0) return; // nothing to clear
+  const confirmed = window.confirm('Clear all cards from your deck? Your Leader will stay selected. This cannot be undone.');
+  if (!confirmed) return;
+
+  deck.clear();
+  updateDeckProgress();
+  if (currentView === 'browse') renderPool();
+  if (currentView === 'deck') renderDeckList();
+}
+
 // ── Card pool (browse view, color-locked to leader) ─────────────────────────
 function getLeaderColors() {
   return selectedLeader ? (selectedLeader.color || []) : [];
@@ -311,6 +322,31 @@ function setPreferredVariant(cardId, variantId) {
   if (currentView === 'deck') renderDeckList();
 }
 
+// All variants of a card that actually have artwork — used to know whether
+// cycling makes sense (need at least 2) and to step through them in order.
+function getArtVariants(card) {
+  return (card.variants || []).filter(v => v.tcgplayer_image_url && !v.tcgplayer_image_url.includes(MISSING_PLACEHOLDER));
+}
+
+// Advances a card's preferred variant to the next available art, wrapping
+// back to the first after the last. Mirrors getDisplayImageUrl's notion of
+// "current" art so cycling feels continuous regardless of how it got there.
+function cycleArt(cardId) {
+  const entry = deck.get(cardId);
+  if (!entry) return;
+  const variants = getArtVariants(entry.card);
+  if (variants.length < 2) return;
+
+  const currentUrl = getDisplayImageUrl(entry.card);
+  const currentIndex = variants.findIndex(v => v.tcgplayer_image_url === currentUrl);
+  const nextIndex = (currentIndex + 1) % variants.length;
+  const nextVariant = variants[nextIndex];
+
+  deck.set(cardId, { ...entry, preferredVariantId: nextVariant.variant_id });
+  if (currentView === 'browse') renderPool();
+  if (currentView === 'deck') renderDeckList();
+}
+
 // Returns the image to display for a card, respecting any preferred variant
 // chosen in the deck. Falls back to the default hero image otherwise.
 function getDisplayImageUrl(card) {
@@ -372,6 +408,13 @@ function renderDeckList() {
       ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${escHtml(card.name || card.id)}" loading="lazy" data-fallback="1"></div>`
       : `<div class="card-img-wrap"><div class="card-img-ph">${cardIconSvg()}</div></div>`;
 
+    const artCount = getArtVariants(card).length;
+    const cycleBtn = artCount > 1
+      ? `<button class="cycle-art-btn" data-action="cycle-art" data-id="${card.id}" title="Cycle art (${artCount} versions)" aria-label="Cycle artwork for ${escHtml(card.name || card.id)}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </button>`
+      : '';
+
     return `
       <div class="deck-card-wrap">
         <article class="card" data-id="${card.id}" tabindex="0">
@@ -386,6 +429,7 @@ function renderDeckList() {
           </div>
         </article>
         <span class="pool-card-count-badge">${count}</span>
+        ${cycleBtn}
         <div class="deck-card-controls">
           <button class="deck-qty-btn" data-action="dec" data-id="${card.id}" aria-label="Remove one">−</button>
           <button class="deck-qty-btn" data-action="inc" data-id="${card.id}" ${count >= MAX_COPIES ? 'disabled' : ''} aria-label="Add one">+</button>
@@ -402,6 +446,7 @@ function renderDeckList() {
   deckList.querySelectorAll('[data-action="inc"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); addToDeck(btn.dataset.id); }));
   deckList.querySelectorAll('[data-action="dec"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); removeFromDeck(btn.dataset.id); }));
   deckList.querySelectorAll('[data-action="remove"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); removeFromDeck(btn.dataset.id, true); }));
+  deckList.querySelectorAll('[data-action="cycle-art"]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); cycleArt(btn.dataset.id); }));
 
   deckList.querySelectorAll('img[data-fallback]').forEach(img => {
     const card = entries.map(e => e.card).find(c => c.id === img.closest('.card').dataset.id);
@@ -739,6 +784,7 @@ document.querySelectorAll('.db-view-btn').forEach(btn => {
 });
 
 document.getElementById('changeLeaderBtn').addEventListener('click', changeLeader);
+document.getElementById('clearDeckBtn').addEventListener('click', clearDeck);
 
 document.getElementById('exportBtn').addEventListener('click', openExportModal);
 document.getElementById('exportCloseBtn').addEventListener('click', closeExportModal);

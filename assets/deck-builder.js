@@ -145,6 +145,12 @@ function selectLeader(cardId) {
   setView('browse');
   renderPool();
   updateDeckProgress();
+
+  // Recalculate after layout settles (image may still be loading, which can
+  // change the leader bar's height slightly)
+  requestAnimationFrame(updateSidebarOffset);
+  document.getElementById('selLeaderImg').addEventListener('load', updateSidebarOffset, { once: true });
+  setTimeout(updateSidebarOffset, 200);
 }
 
 function changeLeader() {
@@ -700,6 +706,20 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') { e.preventDefault(); navigateModal(-1); return; }
   if (e.key === 'ArrowRight') { e.preventDefault(); navigateModal(1); return; }
 });
+
+// ── Sidebar sticky offset (avoids hardcoded magic numbers that drift
+// out of sync with the actual topbar + leader bar height) ───────────────────
+function updateSidebarOffset() {
+  const sidebar = document.querySelector('.deck-sidebar');
+  if (!sidebar) return;
+  const topbar = document.querySelector('.topbar');
+  const leaderBar = document.querySelector('.selected-leader-bar');
+  const offset = (topbar?.offsetHeight || 0) + (leaderBar?.offsetHeight || 0);
+  sidebar.style.top = `${offset}px`;
+  sidebar.style.height = `calc(100vh - ${offset}px)`;
+}
+
+window.addEventListener('resize', updateSidebarOffset);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {

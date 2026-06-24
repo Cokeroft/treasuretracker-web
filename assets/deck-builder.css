@@ -360,11 +360,10 @@
   flex-shrink: 0;
   border-left: 1px solid var(--border);
   position: sticky;
-  top: 113px;
   align-self: flex-start;
-  height: calc(100vh - 113px);
   display: flex;
   flex-direction: column;
+  /* top and height are set dynamically via JS based on actual topbar + leader bar height */
 }
 
 .deck-sidebar-sticky {

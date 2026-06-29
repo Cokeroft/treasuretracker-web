@@ -87,6 +87,7 @@ let activeColors   = new Set();
 let colorMode      = 'any'; // 'any' = OR, 'all' = AND
 let activeTypes    = new Set();
 let activeRarities = new Set();
+let activeBlocks   = new Set();
 let activeAffiliations = new Set();
 let affiliationMode = 'any'; // 'any' = OR, 'all' = AND
 let activeSort     = 'id';
@@ -305,6 +306,12 @@ function getFilteredCards() {
     cards = cards.filter(c => activeRarities.has(c.rarity));
   }
 
+  if (activeBlocks.size > 0) {
+    // Cards with no block assigned yet (block is null/undefined) are excluded from
+    // a specific-block filter, since their block hasn't been verified.
+    cards = cards.filter(c => c.block != null && activeBlocks.has(String(c.block)));
+  }
+
   if (activeAffiliations.size > 0) {
     if (affiliationMode === 'all') {
       // AND: card must have ALL selected affiliations
@@ -502,6 +509,7 @@ function openCard(cardId) {
     ['Type',      card.type      || '—'],
     ['Color',     (card.color || []).join(', ') || '—'],
     ['Rarity',    RARITY_LABEL[card.rarity] || card.rarity || '—'],
+    ['Block',     card.block != null ? card.block : 'Unverified'],
     ['Power',     card.power != null ? card.power : '—'],
     ['Attribute', card.attribute || '—'],
     card.cost != null ? ['Cost', card.cost] :
@@ -766,6 +774,7 @@ document.querySelectorAll('.pill[data-group]').forEach(pill => {
       color:  activeColors,
       type:   activeTypes,
       rarity: activeRarities,
+      block:  activeBlocks,
     };
     const activeSet = stateMap[group];
     const allPillsInGroup = document.querySelectorAll(`.pill[data-group="${group}"]`);

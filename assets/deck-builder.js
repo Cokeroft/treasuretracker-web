@@ -46,6 +46,7 @@ let deck = new Map();       // cardId -> { card, count }
 let currentView = 'browse'; // 'browse' | 'deck'
 let poolSearchTerm = '';
 let poolType = 'all';
+let poolBlock = 'all';
 let poolSort = 'id';
 let currentCardList = [];   // for modal prev/next nav
 let currentCardIndex = -1;
@@ -196,6 +197,11 @@ function getPoolCards() {
 
   if (poolType !== 'all') {
     cards = cards.filter(c => c.type === poolType);
+  }
+
+  if (poolBlock !== 'all') {
+    // Cards with no block assigned yet are excluded from a specific-block filter.
+    cards = cards.filter(c => c.block != null && String(c.block) === poolBlock);
   }
 
   if (poolSort === 'cost') {
@@ -775,6 +781,15 @@ document.querySelectorAll('#poolTypePills .pill').forEach(pill => {
     document.querySelectorAll('#poolTypePills .pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
     poolType = pill.dataset.value;
+    renderPool();
+  });
+});
+
+document.querySelectorAll('#poolBlockPills .pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#poolBlockPills .pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    poolBlock = pill.dataset.value;
     renderPool();
   });
 });

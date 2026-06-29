@@ -50,8 +50,8 @@ const ALL_SETS = [
   { code: 'ST26',  name: 'Purple/Black Monkey D. Luffy',    group: 'starter', available: true  },
   { code: 'ST27',  name: 'Black Marshall D. Teach',         group: 'starter', available: true  },
   { code: 'ST28',  name: 'Green/Yellow Yamato',             group: 'starter', available: true  },
-  { code: 'ST29',  name: 'Starter Deck 29',                 group: 'starter', available: false },
-  { code: 'ST30',  name: 'Starter Deck 30',                 group: 'starter', available: false },
+  { code: 'ST29',  name: 'Egghead',                         group: 'starter', available: true  },
+  { code: 'ST30',  name: 'EX Luffy & Ace',                   group: 'starter', available: true  },
   // ── Extra Boosters ──
   { code: 'EB01',  name: 'Memorial Collection',         group: 'extra',   available: true  },
   { code: 'EB02',  name: 'Anime 25th Collection',       group: 'extra',   available: true  },

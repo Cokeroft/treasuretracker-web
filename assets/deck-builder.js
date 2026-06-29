@@ -71,16 +71,16 @@ const overlay             = document.getElementById('overlay');
 
 // ── Fetch all cards across every available set ──────────────────────────────
 async function loadAllCards() {
-  const available = ALL_SETS.filter(s => s.available);
-  const results = await Promise.all(
-    available.map(s =>
-      fetch(`${API_BASE}/sets/${s.code}/cards`)
-        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-        .then(d => d.cards || [])
-        .catch(() => [])
-    )
-  );
-  allCards = results.flat();
+  try {
+    const res = await fetch(`${API_BASE}/cards`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const availableCodes = new Set(ALL_SETS.filter(s => s.available).map(s => s.code));
+    allCards = (data.cards || []).filter(c => availableCodes.has(c.set));
+  } catch (err) {
+    console.error('Failed to load card catalog:', err);
+    allCards = [];
+  }
 }
 
 // ── Leader selection ─────────────────────────────────────────────────────────

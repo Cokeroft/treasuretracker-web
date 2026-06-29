@@ -203,6 +203,28 @@ function syncAllBtn() {
 }
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
+// Fetches the entire card catalog in a single request and caches it for the
+// rest of the session. Both the main viewer and the affiliation/subtype search
+// pull from this same cache instead of each looping over every set individually.
+async function loadFullCatalog() {
+  if (allCardsCache) return allCardsCache;
+  if (allCardsCacheLoading) {
+    // A fetch is already in flight; wait for it instead of starting a second one.
+    while (allCardsCacheLoading) await new Promise(r => setTimeout(r, 25));
+    return allCardsCache;
+  }
+  allCardsCacheLoading = true;
+  try {
+    const res = await fetch(`${API_BASE}/cards`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    allCardsCache = data.cards || [];
+  } finally {
+    allCardsCacheLoading = false;
+  }
+  return allCardsCache;
+}
+
 async function loadActiveSets() {
   const available = ALL_SETS.filter(s => s.available && activeSets.has(s.code));
 
@@ -218,15 +240,10 @@ async function loadActiveSets() {
   updateHero();
 
   try {
-    const results = await Promise.all(
-      available.map(s =>
-        fetch(`${API_BASE}/sets/${s.code}/cards`)
-          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-          .then(d => d.cards || [])
-      )
-    );
+    const allSetsCards = await loadFullCatalog();
+    const activeCodes = new Set(available.map(s => s.code));
+    allCards = allSetsCards.filter(c => activeCodes.has(c.set));
 
-    allCards = results.flat();
     updateHero();
     updateCollapsedLabel();
     renderAffilChips();
@@ -622,30 +639,17 @@ if (colorModeBtn) {
 }
 
 // ── Affiliation autocomplete ─────────────────────────────────────────────────
-// Fetches every available set once, caches the result, so the affiliation/subtype
-// search always has the full catalog regardless of which sets are currently browsed.
+// The affiliation/subtype search needs the full catalog regardless of which
+// sets are currently browsed. It shares the same cache and fetch as the main
+// viewer (loadFullCatalog), so this is just an alias kept for readability at
+// the call sites below.
 async function loadAllCardsCache() {
-  if (allCardsCache || allCardsCacheLoading) return allCardsCache;
-  allCardsCacheLoading = true;
-
-  const available = ALL_SETS.filter(s => s.available);
   try {
-    const results = await Promise.all(
-      available.map(s =>
-        fetch(`${API_BASE}/sets/${s.code}/cards`)
-          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-          .then(d => d.cards || [])
-          .catch(() => [])  // don't let one failed set break the whole cache
-      )
-    );
-    allCardsCache = results.flat();
+    return await loadFullCatalog();
   } catch (err) {
     console.error('Failed to build full card cache for subtype search:', err);
-    allCardsCache = [...allCards]; // fall back to whatever's currently loaded
-  } finally {
-    allCardsCacheLoading = false;
+    return [...allCards]; // fall back to whatever's currently loaded
   }
-  return allCardsCache;
 }
 
 function getAffiliationCounts() {

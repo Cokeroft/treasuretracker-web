@@ -528,6 +528,7 @@ function openCard(cardId) {
     ['Rarity',    RARITY_LABEL[card.rarity] || card.rarity || '—'],
     ['Block',     card.block != null ? card.block : 'Unverified'],
     ['Power',     card.power != null ? card.power : '—'],
+    ['Counter',   card.counter != null ? `+${card.counter}` : '—'],
     ['Attribute', card.attribute || '—'],
     card.cost != null ? ['Cost', card.cost] :
     card.life != null ? ['Life', card.life] : null,
